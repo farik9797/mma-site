@@ -73,6 +73,7 @@
 
       .partner { @apply text-center text-[12.5px] font-extrabold uppercase leading-[1.15] tracking-[-0.01em] text-navy/85 transition-colors duration-200 hover:text-accent sm:text-[14px] lg:text-left lg:text-[15px]; }
 
+      .partner-logo { @apply mx-auto block w-auto max-w-[130px] object-contain transition-transform duration-300 hover:scale-105 lg:mx-0; }
       .label { @apply mb-1.5 block text-[13px] font-medium text-muted; }
       .field { @apply block h-12 w-full rounded-lg border border-line bg-white px-4 text-[15px] text-ink transition placeholder:text-[#8C9AAB] focus:border-accent focus:outline-none focus:ring-4 focus:ring-accent/15; }
       .field-fill { @apply border-transparent bg-mist focus:bg-white; }
@@ -407,7 +408,7 @@
     </section>
 
     <!-- ============ 8. ПАРТНЁРЫ ============ -->
-    <!-- Названия — временно, до получения исходников логотипов от заказчика (SVG/PNG). Логотипы не рисовать. -->
+    <!-- Логотипы взяты с официальных сайтов компаний (akfamedline.uz, grandpharmlogistics.uz, profiuniversity.uz, veolia.com). Остальные — названия текстом до получения логотипов. Логотипы не рисовать. -->
     <section id="partners" class="bg-white py-14 lg:py-20">
       <div class="container-x">
         <div data-reveal>
@@ -416,12 +417,12 @@
         </div>
         <ul class="mt-8 grid grid-cols-3 items-center gap-x-4 gap-y-7 sm:grid-cols-4 lg:mt-12 lg:flex lg:justify-between lg:gap-6" data-reveal>
           <li class="partner">XALQ<br>RETAIL</li>
-          <li class="partner">AKFA<br>MEDLYAN</li>
+          <li class="partner"><img src="assets/img/partners/akfa-medline.png" alt="AKFA Medline University Hospital" width="380" height="194" loading="lazy" class="partner-logo h-11 sm:h-14"></li>
           <li class="partner">AKFA FOOD<br>SERVICES</li>
           <li class="partner">FAYZ GOLD<br>LIFT-SERVIS</li>
-          <li class="partner">GRAND PHARM<br>LOGISTIC</li>
-          <li class="partner normal-case">Профи<br>университет</li>
-          <li class="partner">ВИОЛИЯ</li>
+          <li class="partner"><img src="assets/img/partners/grand-logistics.svg" alt="Grand Pharm Logistics Hub" width="535" height="175" loading="lazy" class="partner-logo h-8 sm:h-9"></li>
+          <li class="partner"><img src="assets/img/partners/profi-university.svg" alt="Profi University" width="161" height="61" loading="lazy" class="partner-logo h-9 sm:h-10"></li>
+          <li class="partner"><img src="assets/img/partners/veolia.png" alt="Veolia Energy Tashkent" width="299" height="75" loading="lazy" class="partner-logo h-6 sm:h-7"></li>
           <li class="partner normal-case">Родильные<br>дома</li>
         </ul>
       </div>
