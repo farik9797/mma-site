@@ -40,6 +40,21 @@
   updateNav();
   window.addEventListener('scroll', () => { if (!spyTick) { spyTick = true; requestAnimationFrame(updateNav); } }, { passive: true });
 
+  // Кнопка «Получить консультацию»: на мобильном раскрывает форму, на десктопе — фокус на первое поле
+  const ctaOpen = document.getElementById('cta-open');
+  const ctaForm = document.getElementById('cta-form');
+  if (ctaOpen && ctaForm) {
+    ctaOpen.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (!window.matchMedia('(min-width: 1024px)').matches) {
+        const open = ctaForm.classList.toggle('hidden') === false;
+        ctaOpen.setAttribute('aria-expanded', String(open));
+        if (!open) return;
+      }
+      ctaForm.querySelector('input').focus({ preventScroll: false });
+    });
+  }
+
   // Формы: проверка обязательных полей.
   // Макет: отправка не подключена — на WordPress подключить обработчик (CF7 / admin-ajax).
   document.querySelectorAll('.js-form').forEach((form) => {
@@ -85,7 +100,7 @@
   gsap.registerPlugin(ScrollTrigger);
   gsap.matchMedia().add('(prefers-reduced-motion: no-preference)', () => {
     gsap.from('.hero-anim', { y: 24, opacity: 0, duration: 0.8, ease: 'power3.out', stagger: 0.08 });
-    gsap.from('.hero-media img', { scale: 1.06, opacity: 0, duration: 1.4, ease: 'power2.out' });
+    gsap.from('.hero-img', { scale: 1.06, opacity: 0, duration: 1.4, ease: 'power2.out' });
 
     gsap.set('[data-reveal]', { y: 28, opacity: 0 });
     ScrollTrigger.batch('[data-reveal]', {
