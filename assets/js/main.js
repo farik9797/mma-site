@@ -79,6 +79,7 @@
         d.setAttribute('aria-current', String(i === current));
       });
       restartBar(dots[current]);
+      remaining = DURATION; // новый слайд — отсчёт с начала (даже если сейчас пауза)
       schedule(DURATION);
     };
     const pause = () => {
@@ -94,11 +95,13 @@
     };
 
     dots.forEach((d, i) => d.addEventListener('click', () => goTo(i)));
-    // Пауза только от мыши: на телефоне касание не должно останавливать автопрокрутку
-    hero.addEventListener('pointerenter', (e) => { if (e.pointerType === 'mouse') { hovered = true; pause(); } });
-    hero.addEventListener('pointerleave', (e) => { if (e.pointerType === 'mouse') { hovered = false; resume(); } });
-    hero.addEventListener('focusin', () => { focused = true; pause(); });
-    hero.addEventListener('focusout', (e) => { if (!hero.contains(e.relatedTarget)) { focused = false; resume(); } });
+    // Пауза только при наведении/фокусе на кнопки-точки (мышь; касание на телефоне не останавливает)
+    const dotsBox = hero.querySelector('.hero-dots');
+    dotsBox.addEventListener('pointerenter', (e) => { if (e.pointerType === 'mouse') { hovered = true; pause(); } });
+    dotsBox.addEventListener('pointerleave', (e) => { if (e.pointerType === 'mouse') { hovered = false; resume(); } });
+    // Фокус ставит паузу только при навигации с клавиатуры (после клика мышью кнопка тоже в фокусе)
+    dotsBox.addEventListener('focusin', (e) => { if (e.target.matches(':focus-visible')) { focused = true; pause(); } });
+    dotsBox.addEventListener('focusout', (e) => { if (!dotsBox.contains(e.relatedTarget)) { focused = false; resume(); } });
     document.addEventListener('visibilitychange', () => (document.hidden ? pause() : resume()));
 
     // Свайп на сенсорных экранах
