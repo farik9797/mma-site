@@ -41,10 +41,9 @@
   window.addEventListener('scroll', () => { if (!spyTick) { spyTick = true; requestAnimationFrame(updateNav); } }, { passive: true });
 
   // Hero-слайдер (по образцу expertecogroup): фото и тексты меняются вместе.
-  // Автосмена каждые 5 с; вкладки, стрелки клавиатуры и свайп — вручную. Пауза: наведение на
-  // вкладки, фокус с клавиатуры внутри hero, фоновая вкладка. При prefers-reduced-motion не листает.
+  // Автосмена каждые 5 с; вручную — полосы-кнопки снизу, стрелки клавиатуры и свайп. Пауза: наведение
+  // на полосы, фокус с клавиатуры внутри hero, фоновая вкладка. При prefers-reduced-motion не листает.
   const hero = document.querySelector('[data-hero]');
-  const tabs = hero ? [...hero.querySelectorAll('.hero-tab')] : [];
   const panes = hero ? [...hero.querySelectorAll('.hero-pane')] : [];
   const slides = hero ? [...hero.querySelectorAll('.hero-slide')] : [];
   const bars = hero ? [...hero.querySelectorAll('.hero-status__bar')] : [];
@@ -90,10 +89,8 @@
       current = n;
       mark(panes, n);
       mark(slides, n);
-      mark(tabs, n);
-      bars.forEach((b, k) => { b.classList.toggle('is-done', k < n); b.classList.remove('is-active'); });
+      bars.forEach((b, k) => { b.classList.toggle('is-done', k < n); b.classList.remove('is-active'); b.setAttribute('aria-current', String(k === n)); });
       if (bars[n]) { void bars[n].offsetWidth; bars[n].classList.add('is-active'); }
-      tabs.forEach((t, k) => t.setAttribute('aria-selected', String(k === n)));
       panes.forEach((p, k) => { p.setAttribute('aria-hidden', String(k !== n)); p.inert = k !== n; });
       remaining = DURATION; // новый слайд — отсчёт с начала
       schedule(DURATION);
@@ -112,25 +109,25 @@
       schedule(remaining || DURATION);
     };
 
-    tabs.forEach((t, i) => t.addEventListener('click', () => go(i, i > current ? 1 : -1)));
-    hero.querySelector('.hero-tabs').addEventListener('keydown', (e) => {
+    const statusBox = hero.querySelector('.hero-status');
+    bars.forEach((b, i) => b.addEventListener('click', () => go(i, i > current ? 1 : -1)));
+    statusBox.addEventListener('keydown', (e) => {
       if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
       e.preventDefault();
       const dir = e.key === 'ArrowRight' ? 1 : -1;
       go(current + dir, dir);
-      tabs[current].focus();
+      bars[current].focus();
     });
 
-    // Пауза при наведении мыши на вкладки (касание на телефоне не останавливает)
-    const tabsBox = hero.querySelector('.hero-tabs');
-    tabsBox.addEventListener('pointerenter', (e) => { if (e.pointerType === 'mouse') { hovered = true; pause(); } });
-    tabsBox.addEventListener('pointerleave', (e) => { if (e.pointerType === 'mouse') { hovered = false; resume(); } });
+    // Пауза при наведении мыши на полосы-кнопки (касание на телефоне не останавливает)
+    statusBox.addEventListener('pointerenter', (e) => { if (e.pointerType === 'mouse') { hovered = true; pause(); } });
+    statusBox.addEventListener('pointerleave', (e) => { if (e.pointerType === 'mouse') { hovered = false; resume(); } });
     // Фокус с клавиатуры внутри hero — пауза, чтобы слайд не уехал из-под фокуса (клик мышью не считается)
     hero.addEventListener('focusin', (e) => { if (e.target.matches(':focus-visible')) { focused = true; pause(); } });
     hero.addEventListener('focusout', (e) => { if (!hero.contains(e.relatedTarget)) { focused = false; resume(); } });
     document.addEventListener('visibilitychange', () => (document.hidden ? pause() : resume()));
 
-    // Свайп пальцем/стилусом: мышью листают вкладками, протяжка мышью — это выделение текста
+    // Свайп пальцем/стилусом: мышью листают полосами, протяжка мышью — это выделение текста
     let sx = 0;
     let sy = 0;
     let tracking = false;
@@ -148,6 +145,19 @@
     hero.addEventListener('pointercancel', () => { tracking = false; });
 
     schedule(DURATION);
+  }
+
+  // Кнопка «Наверх»: показываем, когда hero ушёл из вида; прокрутка без «#top» в адресе
+  const toTop = document.getElementById('to-top');
+  const topSection = document.getElementById('top');
+  if (toTop && topSection) {
+    new IntersectionObserver(([entry]) => toTop.classList.toggle('is-visible', !entry.isIntersecting)).observe(topSection);
+    toTop.addEventListener('click', (e) => {
+      e.preventDefault();
+      const smooth = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      window.scrollTo({ top: 0, behavior: smooth ? 'smooth' : 'auto' });
+      document.querySelector('#site-header a').focus({ preventScroll: true }); // фокус — в начало страницы
+    });
   }
 
   // Кнопка «Получить консультацию»: на мобильном раскрывает форму, на десктопе — фокус на первое поле
