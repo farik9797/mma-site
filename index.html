@@ -95,6 +95,42 @@
       .news-track::-webkit-scrollbar { display: none; }
 
       #site-header.is-scrolled { @apply border-line shadow-[0_10px_30px_-20px_rgba(16,43,70,0.35)]; }
+
+      /* Hero: фото в ромбах (повёрнутый квадрат + контр-поворот картинки) */
+      .hero-art-wrap { @apply relative; }
+      .hero-art { position: relative; height: 380px; --d: 240px; --cx: 52%; --cy: 185px; }
+      .dia { position: absolute; width: var(--d); height: var(--d); left: calc(var(--cx) - var(--d) / 2); top: calc(var(--cy) - var(--d) / 2); transform: rotate(45deg); border-radius: calc(var(--d) * 0.13); overflow: hidden; }
+      .dia > img { position: absolute; width: 142%; height: 142%; max-width: none; left: -21%; top: -21%; transform: rotate(-45deg); object-fit: cover; }
+      .dia-frame { background: #102B46; translate: calc(var(--d) * 0.07) calc(var(--d) * -0.07); }
+      .dia-main { box-shadow: 0 40px 80px -40px rgba(16, 43, 70, 0.6); }
+      .dia-small { --s: calc(var(--d) * 0.44); width: var(--s); height: var(--s); left: calc(var(--cx) - var(--d) * 0.8); top: calc(var(--cy) + var(--d) * 0.1); border-radius: calc(var(--s) * 0.16); outline: 5px solid #fff; box-shadow: 0 24px 50px -24px rgba(16, 43, 70, 0.6); }
+      .hero-badge { position: absolute; width: calc(var(--d) * 0.24); height: calc(var(--d) * 0.24); left: calc(var(--cx) - var(--d) * 0.44); top: calc(var(--cy) - var(--d) * 0.36); }
+      @media (min-width: 640px) { .hero-art { height: 480px; --d: 320px; --cy: 235px; } }
+      @media (min-width: 1024px) {
+        .hero-art { height: 560px; --d: 400px; --cx: 56%; --cy: 270px; }
+        .hero-strip { position: absolute; bottom: 0; left: 16%; right: -12px; }
+        .hero-art-wrap { min-height: 600px; }
+      }
+      @media (min-width: 1280px) { .hero-art { --d: 430px; --cy: 285px; height: 590px; } .hero-art-wrap { min-height: 630px; } }
+
+      /* Попап заявки: нативный <dialog>; на мобильном — нижняя шторка */
+      .modal {
+        @apply m-auto max-h-[calc(100dvh-32px)] w-[calc(100%-32px)] max-w-[480px] overflow-y-auto rounded-xl border-0 bg-white p-0 text-ink shadow-[0_40px_90px_-30px_rgba(12,34,56,0.55)];
+        opacity: 0;
+        transform: translateY(14px) scale(0.98);
+        transition: opacity 0.22s ease, transform 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+      .modal::backdrop { background: rgba(12, 34, 56, 0); transition: background 0.25s ease; }
+      .modal.is-visible { opacity: 1; transform: none; }
+      .modal.is-visible::backdrop { background: rgba(12, 34, 56, 0.62); }
+      @media (max-width: 639px) {
+        .modal { margin: auto 0 0; width: 100%; max-width: 100%; max-height: 92dvh; border-radius: 16px 16px 0 0; transform: translateY(100%); }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .modal, .modal::backdrop { transition: none; }
+      }
+      .field-error { @apply mt-1.5 text-[13px] text-[#B42318]; }
+      .btn:active { @apply scale-[0.98]; }
     }
   </style>
 </head>
@@ -130,7 +166,7 @@
         <a href="#contacts" class="hidden items-center gap-2 text-[14px] font-medium text-navy transition-colors hover:text-accent xl:flex">
           <i data-lucide="phone" class="h-4 w-4 text-accent"></i>+998 XX XXX-XX-XX
         </a>
-        <a href="#cta" class="btn btn-primary hidden h-11 px-6 text-[14px] lg:inline-flex">Оставить заявку</a>
+        <a href="#cta" data-modal-open class="btn btn-primary hidden h-11 px-6 text-[14px] lg:inline-flex">Оставить заявку</a>
         <button id="menu-toggle" type="button" class="-mr-2 grid h-11 w-11 cursor-pointer place-items-center rounded-md text-navy lg:hidden" aria-expanded="false" aria-controls="mobile-menu" aria-label="Открыть меню">
           <i data-lucide="menu" class="icon-open h-7 w-7"></i>
           <i data-lucide="x" class="icon-close hidden h-7 w-7"></i>
@@ -150,58 +186,74 @@
         </ul>
         <div class="mt-4 grid gap-3">
           <a href="#contacts" class="btn w-full border border-line text-navy"><i data-lucide="phone" class="!h-4 !w-4 text-accent"></i>+998 XX XXX-XX-XX</a>
-          <a href="#cta" class="btn btn-primary w-full">Оставить заявку</a>
+          <a href="#cta" data-modal-open class="btn btn-primary w-full">Оставить заявку</a>
         </div>
       </nav>
     </div>
   </header>
 
   <main id="main">
-    <!-- ============ 2. HERO ============ -->
-    <section id="top" class="relative isolate overflow-hidden bg-navy text-white">
-      <img
-        src="https://images.unsplash.com/photo-1737874960921-d1205a4f55da?auto=format&fit=crop&w=1600&q=80"
-        srcset="https://images.unsplash.com/photo-1737874960921-d1205a4f55da?auto=format&fit=crop&w=800&q=80 800w,
-                https://images.unsplash.com/photo-1737874960921-d1205a4f55da?auto=format&fit=crop&w=1600&q=80 1600w,
-                https://images.unsplash.com/photo-1737874960921-d1205a4f55da?auto=format&fit=crop&w=2200&q=80 2200w"
-        sizes="(min-width: 1024px) 64vw, 100vw"
-        alt="Специалисты в защитных касках и сигнальных жилетах проверяют документацию на производстве"
-        width="1600" height="1067" fetchpriority="high"
-        class="hero-img absolute inset-0 -z-20 h-full w-full object-cover object-[72%_center] lg:left-auto lg:right-0 lg:w-[64%] lg:object-center">
-      <div class="hero-shade absolute inset-0 -z-10" aria-hidden="true"></div>
+    <!-- ============ 2. HERO (структура по референсу: заголовок слева, фото-ромбы справа, полоса направлений) ============ -->
+    <section id="top" class="relative isolate overflow-hidden bg-white">
+      <div class="pointer-events-none absolute -left-40 -top-56 -z-10 h-[520px] w-[520px] rotate-45 rounded-[72px] bg-mist" aria-hidden="true"></div>
+      <div class="pointer-events-none absolute -bottom-40 left-[30%] -z-10 hidden h-[360px] w-[360px] rotate-45 rounded-[56px] bg-mist/70 lg:block" aria-hidden="true"></div>
 
-      <div class="container-x flex min-h-[600px] flex-col justify-between pb-8 pt-10 sm:min-h-[640px] lg:min-h-[690px] lg:pb-14 lg:pt-24">
-        <div class="max-w-[660px]">
-          <p class="hero-anim text-[11.5px] font-semibold uppercase tracking-[0.05em] sm:text-[13px]">
-            <span class="text-accent-300">Обучение</span><span class="text-white/90"> • Аттестация • Безопасность</span>
+      <div class="container-x grid items-center gap-8 pb-12 pt-10 lg:grid-cols-[1fr_1.05fr] lg:gap-4 lg:pb-14 lg:pt-12">
+        <div class="max-w-[580px]">
+          <p class="hero-anim inline-flex items-center gap-2 rounded-full bg-navy px-4 py-2 text-[12.5px] font-semibold text-white sm:text-[13px]">
+            <i data-lucide="map-pin" class="h-4 w-4 text-accent-300"></i>Работаем по всему Узбекистану
           </p>
-          <h1 class="hero-anim mt-4 text-[26px] font-bold leading-[1.2] tracking-[-0.01em] min-[400px]:text-[28px] sm:text-[42px] lg:mt-5 lg:text-[50px] lg:leading-[1.12]">
-            Охрана труда <br>и&nbsp;техника безопасности <br>для&nbsp;вашего предприятия
+          <h1 class="hero-anim mt-6 font-extrabold uppercase leading-[0.98] tracking-[-0.02em]">
+            <span class="block text-[38px] text-navy sm:text-[54px] lg:text-[58px] xl:text-[66px]">Охрана труда</span>
+            <span class="block text-[38px] text-accent sm:text-[54px] lg:text-[58px] xl:text-[66px]">и&nbsp;техника <br>безопасности</span>
+            <span class="mt-5 flex items-center normal-case tracking-normal">
+              <span class="rounded-full bg-navy px-5 py-2.5 text-[13px] font-bold uppercase tracking-[0.04em] text-white sm:text-[15px]">для&nbsp;вашего предприятия</span>
+              <span class="h-[2px] w-10 bg-navy sm:w-16" aria-hidden="true"></span>
+              <span class="h-2 w-2 rounded-full bg-navy" aria-hidden="true"></span>
+            </span>
           </h1>
-          <p class="hero-anim mt-5 max-w-[480px] text-[15px] leading-relaxed text-white/80 sm:text-[17px] lg:mt-6">
-            Профессиональное обучение и аттестация рабочих мест. Помогаем организациям Узбекистана обеспечивать безопасность сотрудников и&nbsp;соблюдать установленные требования.
+          <p class="hero-anim mt-6 max-w-[500px] text-[15.5px] leading-relaxed text-muted sm:text-[17px]">
+            Профессиональное <b class="font-semibold text-accent">обучение и&nbsp;аттестация рабочих мест</b>. Помогаем организациям Узбекистана обеспечивать <b class="font-semibold text-accent">безопасность сотрудников</b> и&nbsp;соблюдать установленные требования.
           </p>
-          <div class="hero-anim mt-8 flex flex-col items-start gap-3.5 sm:flex-row sm:items-center sm:gap-5 lg:mt-10">
-            <a href="#cta" class="btn btn-primary">Оставить заявку <i data-lucide="arrow-right"></i></a>
-            <a href="#services" class="btn btn-outline-light">Наши услуги <i data-lucide="arrow-right"></i></a>
+          <div class="hero-anim mt-8 flex flex-col items-start gap-3.5 sm:flex-row sm:items-center sm:gap-4">
+            <a href="#cta" data-modal-open class="btn btn-primary">Оставить заявку <i data-lucide="arrow-right"></i></a>
+            <a href="#services" class="btn border border-navy/20 text-navy hover:border-accent hover:text-accent">Наши услуги <i data-lucide="arrow-right"></i></a>
           </div>
         </div>
 
-        <dl class="hero-anim mt-12 grid grid-cols-2 gap-4 sm:max-w-[600px] sm:gap-10">
-          <div class="flex items-center gap-3">
-            <span class="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-white/35 sm:h-12 sm:w-12"><i data-lucide="shield-check" class="h-5 w-5"></i></span>
-            <div>
-              <dt class="text-[13px] font-semibold sm:text-[15px]">С 2010 года</dt>
-              <dd class="text-[11.5px] leading-snug text-white/70 sm:text-[13px]">на рынке образовательных услуг</dd>
+        <div class="hero-art-wrap">
+          <div class="hero-art" aria-hidden="true">
+            <div class="dia dia-frame"></div>
+            <div class="dia dia-main">
+              <img src="https://images.unsplash.com/photo-1715966743489-0ac1138420a5?auto=format&fit=crop&w=1200&q=80" alt="" width="1200" height="800" fetchpriority="high">
             </div>
-          </div>
-          <div class="flex items-center gap-3">
-            <span class="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-white/35 sm:h-12 sm:w-12"><i data-lucide="map-pin" class="h-5 w-5"></i></span>
-            <div>
-              <dt class="text-[13px] font-semibold leading-snug sm:text-[15px]">Работаем по всему <br>Узбекистану</dt>
+            <div class="dia dia-small">
+              <img src="https://images.unsplash.com/photo-1588011930968-eadac80e6a5a?auto=format&fit=crop&w=600&q=80" alt="" width="600" height="400">
             </div>
+            <span class="hero-badge grid place-items-center rounded-2xl bg-white text-accent shadow-[0_20px_44px_-16px_rgba(23,105,194,0.55)]">
+              <i data-lucide="shield-check" class="h-1/2 w-1/2" stroke-width="1.75"></i>
+            </span>
           </div>
-        </dl>
+
+          <ul class="hero-strip relative -mt-12 grid grid-cols-2 gap-y-6 rounded-xl bg-navy px-3 py-6 sm:-mt-16 lg:mt-0 text-white shadow-[0_30px_60px_-30px_rgba(16,43,70,0.7)] sm:grid-cols-4 sm:gap-y-0 sm:divide-x sm:divide-white/15">
+            <li class="flex flex-col items-center gap-2.5 px-2 text-center">
+              <i data-lucide="graduation-cap" class="h-7 w-7 text-accent-300" stroke-width="1.5"></i>
+              <span class="text-[13px] font-semibold leading-tight">Обучение <br>по ОТ и ТБ</span>
+            </li>
+            <li class="flex flex-col items-center gap-2.5 px-2 text-center">
+              <i data-lucide="clipboard-check" class="h-7 w-7 text-accent-300" stroke-width="1.5"></i>
+              <span class="text-[13px] font-semibold leading-tight">Аттестация <br>рабочих мест</span>
+            </li>
+            <li class="flex flex-col items-center gap-2.5 px-2 text-center">
+              <i data-lucide="ruler" class="h-7 w-7 text-accent-300" stroke-width="1.5"></i>
+              <span class="text-[13px] font-semibold leading-tight">Замеры <br>на объекте</span>
+            </li>
+            <li class="flex flex-col items-center gap-2.5 px-2 text-center">
+              <i data-lucide="file-check" class="h-7 w-7 text-accent-300" stroke-width="1.5"></i>
+              <span class="text-[13px] font-semibold leading-tight">Оформление <br>документов</span>
+            </li>
+          </ul>
+        </div>
       </div>
     </section>
 
@@ -594,6 +646,66 @@
       </div>
     </div>
   </footer>
+
+  <!-- ============ ПОПАП «ОСТАВИТЬ ЗАЯВКУ» ============ -->
+  <dialog id="lead-modal" class="modal" aria-labelledby="lead-modal-title">
+    <div class="relative p-6 sm:p-9">
+      <button type="button" data-modal-close class="absolute right-3 top-3 grid h-10 w-10 cursor-pointer place-items-center rounded-full text-muted transition-colors hover:bg-mist hover:text-navy" aria-label="Закрыть">
+        <i data-lucide="x" class="h-5 w-5"></i>
+      </button>
+
+      <div data-modal-view="form">
+        <span class="grid h-12 w-12 place-items-center rounded-full bg-accent/10 text-accent">
+          <i data-lucide="clipboard-pen" class="h-[22px] w-[22px]"></i>
+        </span>
+        <h2 id="lead-modal-title" class="mt-5 text-[22px] font-bold leading-snug text-navy sm:text-[24px]">Оставить заявку</h2>
+        <p class="mt-2 text-[15px] leading-relaxed text-muted">Оставьте контакты, и менеджер свяжется с вами, чтобы уточнить задачу.</p>
+
+        <form class="js-modal-form mt-6 grid gap-4" novalidate>
+          <div>
+            <label class="mb-1.5 block text-[13.5px] font-medium text-navy" for="m-name">Ваше имя <span class="text-accent">*</span></label>
+            <input id="m-name" name="name" class="field" type="text" required autocomplete="name" aria-describedby="m-name-err">
+            <p id="m-name-err" class="field-error hidden">Укажите, как к вам обращаться</p>
+          </div>
+          <div>
+            <label class="mb-1.5 block text-[13.5px] font-medium text-navy" for="m-phone">Телефон <span class="text-accent">*</span></label>
+            <input id="m-phone" name="phone" class="field" type="tel" required autocomplete="tel" inputmode="tel" placeholder="+998 __ ___-__-__" aria-describedby="m-phone-err">
+            <p id="m-phone-err" class="field-error hidden">Введите номер телефона полностью</p>
+          </div>
+          <div>
+            <label class="mb-1.5 block text-[13.5px] font-medium text-navy" for="m-service">Вид услуги</label>
+            <div class="relative">
+              <select id="m-service" name="service" class="field cursor-pointer appearance-none pr-10">
+                <option value="" selected>Выберите услугу</option>
+                <option>Обучение по охране труда и ТБ</option>
+                <option>Аттестация рабочих мест</option>
+                <option>Другой вопрос</option>
+              </select>
+              <i data-lucide="chevron-down" class="pointer-events-none absolute right-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted"></i>
+            </div>
+          </div>
+          <div>
+            <label class="flex cursor-pointer items-start gap-3 text-[13.5px] leading-snug text-muted">
+              <input type="checkbox" name="consent" required class="check" aria-describedby="m-consent-err">
+              <span>Я согласен на <a href="#" class="text-accent underline-offset-2 hover:underline">обработку персональных данных</a></span>
+            </label>
+            <p id="m-consent-err" class="field-error hidden">Нужно согласие на обработку данных</p>
+          </div>
+          <button type="submit" class="btn btn-primary mt-1 w-full disabled:cursor-wait disabled:opacity-70">Отправить заявку</button>
+        </form>
+      </div>
+
+      <div data-modal-view="success" class="hidden py-4 text-center" role="status" aria-live="polite">
+        <span class="mx-auto grid h-16 w-16 place-items-center rounded-full bg-accent/10 text-accent">
+          <i data-lucide="circle-check-big" class="h-8 w-8"></i>
+        </span>
+        <p class="mt-5 text-[22px] font-bold text-navy">Спасибо!</p>
+        <p class="mx-auto mt-2 max-w-[320px] text-[15px] leading-relaxed text-muted">Менеджер свяжется с вами по указанному телефону.</p>
+        <p class="mx-auto mt-4 max-w-[320px] rounded-lg bg-mist px-4 py-2.5 text-[13px] text-muted">Демо-режим макета: отправка будет подключена на сайте.</p>
+        <button type="button" data-modal-close class="btn mt-6 border border-line px-10 text-navy hover:border-accent hover:text-accent">Закрыть</button>
+      </div>
+    </div>
+  </dialog>
 
   <script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>

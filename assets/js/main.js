@@ -95,12 +95,104 @@
     });
   });
 
+  // Попап «Оставить заявку» (нативный <dialog>). Без JS кнопки ведут к форме в блоке #cta.
+  const modal = document.getElementById('lead-modal');
+  if (modal && typeof modal.showModal === 'function') {
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const modalForm = modal.querySelector('.js-modal-form');
+    const views = {
+      form: modal.querySelector('[data-modal-view="form"]'),
+      success: modal.querySelector('[data-modal-view="success"]'),
+    };
+    const submitBtn = modalForm.querySelector('[type="submit"]');
+    let closeTimer = null;
+
+    const showView = (name) => {
+      views.form.classList.toggle('hidden', name !== 'form');
+      views.success.classList.toggle('hidden', name !== 'success');
+    };
+
+    const openModal = () => {
+      clearTimeout(closeTimer);
+      showView('form');
+      if (!modal.open) modal.showModal();
+      document.documentElement.classList.add('overflow-hidden');
+      void modal.offsetWidth; // фиксируем стартовое состояние, чтобы сработал transition
+      modal.classList.add('is-visible');
+      modalForm.querySelector('input').focus();
+    };
+
+    const finishClose = () => {
+      if (modal.open) modal.close();
+    };
+
+    const closeModal = () => {
+      modal.classList.remove('is-visible');
+      document.documentElement.classList.remove('overflow-hidden');
+      closeTimer = setTimeout(finishClose, reduceMotion.matches ? 0 : 260);
+    };
+
+    document.querySelectorAll('[data-modal-open]').forEach((btn) => {
+      btn.addEventListener('click', (e) => { e.preventDefault(); openModal(); });
+    });
+    modal.querySelectorAll('[data-modal-close]').forEach((btn) => btn.addEventListener('click', closeModal));
+    // Клик по затемнению (вне панели) закрывает попап
+    modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+    // Esc: перехватываем, чтобы закрыть с анимацией
+    modal.addEventListener('cancel', (e) => { e.preventDefault(); closeModal(); });
+    modal.addEventListener('close', () => {
+      document.documentElement.classList.remove('overflow-hidden');
+      modal.classList.remove('is-visible');
+    });
+
+    const rules = {
+      name: (f) => f.value.trim() !== '',
+      phone: (f) => f.value.replace(/\D/g, '').length >= 9,
+      consent: (f) => f.checked,
+    };
+    const setFieldState = (f, ok) => {
+      f.classList.toggle('is-invalid', !ok);
+      if (ok) f.removeAttribute('aria-invalid'); else f.setAttribute('aria-invalid', 'true');
+      const err = document.getElementById(f.getAttribute('aria-describedby'));
+      if (err) err.classList.toggle('hidden', ok);
+    };
+
+    modalForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      let firstInvalid = null;
+      Object.entries(rules).forEach(([name, check]) => {
+        const f = modalForm.elements[name];
+        const ok = check(f);
+        setFieldState(f, ok);
+        if (!ok && !firstInvalid) firstInvalid = f;
+      });
+      if (firstInvalid) { firstInvalid.focus(); return; }
+
+      // Макет: имитация отправки. На WordPress заменить на реальный запрос (CF7 / admin-ajax).
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Отправляем…';
+      setTimeout(() => {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Отправить заявку';
+        modalForm.reset();
+        showView('success');
+        views.success.querySelector('[data-modal-close]').focus();
+      }, 700);
+    });
+
+    modalForm.addEventListener('input', (e) => {
+      const f = e.target;
+      if (f.classList.contains('is-invalid') && rules[f.name] && rules[f.name](f)) setFieldState(f, true);
+    });
+  }
+
   // Анимации появления (GSAP). Без JS/GSAP контент виден как есть.
   if (!window.gsap || !window.ScrollTrigger) return;
   gsap.registerPlugin(ScrollTrigger);
   gsap.matchMedia().add('(prefers-reduced-motion: no-preference)', () => {
     gsap.from('.hero-anim', { y: 24, opacity: 0, duration: 0.8, ease: 'power3.out', stagger: 0.08 });
-    gsap.from('.hero-img', { scale: 1.06, opacity: 0, duration: 1.4, ease: 'power2.out' });
+    gsap.from('.hero-art', { y: 30, opacity: 0, duration: 1.1, ease: 'power3.out', delay: 0.15 });
+    gsap.from('.hero-strip', { y: 24, opacity: 0, duration: 0.9, ease: 'power3.out', delay: 0.45 });
 
     gsap.set('[data-reveal]', { y: 28, opacity: 0 });
     ScrollTrigger.batch('[data-reveal]', {
