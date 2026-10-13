@@ -97,20 +97,45 @@
 
       #site-header.is-scrolled { @apply border-line shadow-[0_10px_30px_-20px_rgba(16,43,70,0.35)]; }
 
-      /* Hero-слайдер: смена фона через прозрачность + медленное приближение кадра */
-      .hero { --slide-dur: 6500ms; }
-      .hero-slide { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transform: scale(1.12); transition: opacity 1.4s ease-in-out, transform 9s cubic-bezier(0.25, 0.1, 0.25, 1); will-change: opacity, transform; }
+      /* Hero-слайдер (по образцу expertecogroup): фон — смена прозрачности + медленное приближение,
+         тексты — уезжают по горизонтали, вкладки сверху, полосы прогресса снизу */
+      .hero { --slide-dur: 5000ms; touch-action: pan-y; }
+      .hero-inner { min-height: 640px; }
+      @media (min-width: 1024px) { .hero-inner { min-height: min(calc(100svh - 80px), 860px); } }
+      .hero-slide { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transform: scale(1.12); transition: opacity 1.2s ease-in-out, transform 9s cubic-bezier(0.25, 0.1, 0.25, 1); will-change: opacity, transform; }
       .hero-slide.is-active { opacity: 1; transform: scale(1); }
-      .hero-dot { @apply relative h-1.5 w-8 cursor-pointer overflow-hidden rounded-full bg-white/30 transition-all duration-300 hover:bg-white/50; }
-      .hero-dot::before { content: ''; @apply absolute -inset-y-3 inset-x-0; } /* увеличенная зона нажатия */
-      .hero-dot.is-active { @apply w-14; }
-      .hero-dot-bar { @apply absolute inset-0 origin-left scale-x-0 rounded-full bg-white; }
-      .hero-dot.is-active .hero-dot-bar { animation: hero-progress var(--slide-dur) linear forwards; }
-      .hero.is-paused .hero-dot.is-active .hero-dot-bar { animation-play-state: paused; }
+
+      .hero-tabs { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+      .hero-tab { cursor: pointer; border-radius: 999px; border: 1px solid rgba(255, 255, 255, 0.22); background: rgba(255, 255, 255, 0.1); padding: 0.6rem 1.1rem; font-size: 14px; font-weight: 600; line-height: 1.2; color: rgba(255, 255, 255, 0.88); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); transition: background-color 0.3s, color 0.3s, border-color 0.3s; }
+      .hero-tab:hover { background: rgba(255, 255, 255, 0.22); color: #fff; }
+      .hero-tab.is-active { border-color: #fff; background: #fff; color: #102B46; }
+      @media (max-width: 639px) { .hero-tabs { gap: 0.4rem; } .hero-tab { padding: 0.5rem 0.85rem; font-size: 13px; } }
+
+      .hero-panes { display: grid; overflow: hidden; }
+      .hero-pane { grid-area: 1 / 1; align-self: end; opacity: 0; transform: translateX(100%); transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s ease; }
+      .hero-pane.is-active { opacity: 1; transform: none; }
+      .hero-pane:not(.is-active) { pointer-events: none; }
+      .hero-title { @apply text-[27px] font-bold leading-[1.18] tracking-[-0.01em] sm:text-[42px] lg:text-[50px] lg:leading-[1.12]; }
+      .hero-text { @apply mt-5 max-w-[500px] text-[15px] leading-relaxed text-white/80 sm:text-[17px]; }
+      .hero-actions { @apply mt-8 flex flex-col items-start gap-3.5 sm:flex-row sm:items-center sm:gap-4; }
+
+      .hero-card { @apply hidden rounded-3xl border border-white/20 p-6 lg:block; background: rgba(16, 43, 70, 0.5); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12); }
+      .hero-card-eyebrow { @apply text-[12px] font-bold uppercase tracking-[0.12em] text-white/70; }
+      .hero-card-link { @apply mt-6 inline-flex items-center gap-2 text-[14.5px] font-semibold text-accent-300 transition-colors hover:text-white; }
+      .hero-card-link svg { @apply h-4 w-4; }
+
+      .hero-status { display: flex; justify-content: center; gap: 0.5rem; margin-top: 2rem; }
+      .hero-status__bar { position: relative; width: 48px; height: 4px; overflow: hidden; border-radius: 999px; background: rgba(255, 255, 255, 0.28); }
+      @media (min-width: 768px) { .hero-status__bar { width: 62px; } }
+      .hero-status__bar i { position: absolute; inset: 0; border-radius: 999px; background: #fff; transform: scaleX(0); transform-origin: left center; transition: transform 0.4s ease; }
+      .hero-status__bar.is-done i { transform: scaleX(1); }
+      .hero-status__bar.is-active i { transition: none; animation: hero-progress var(--slide-dur) linear forwards; }
+      .hero.is-paused .hero-status__bar.is-active i { animation-play-state: paused; }
       @keyframes hero-progress { to { transform: scaleX(1); } }
       @media (prefers-reduced-motion: reduce) {
-        .hero-slide { transition: none; transform: none; }
-        .hero-dot.is-active .hero-dot-bar { animation: none; transform: scaleX(1); }
+        .hero-slide, .hero-pane { transition: none; }
+        .hero-slide { transform: none; }
+        .hero-status__bar.is-active i { animation: none; transform: scaleX(1); }
       }
 
       /* Попап заявки: нативный <dialog>; на мобильном — нижняя шторка */
@@ -193,72 +218,119 @@
   </header>
 
   <main id="main">
-    <!-- ============ 2. HERO ============ -->
-    <section id="top" class="hero relative isolate overflow-hidden bg-navy text-white" aria-roledescription="слайдер" aria-label="Фото направлений работы">
-      <!-- Слайдер фона: смена кадров плавная, текст hero не меняется -->
-      <div class="hero-slides absolute inset-0 -z-20">
-        <img
-          src="assets/img/hero-blueprint.jpg"
-          srcset="assets/img/hero-blueprint-1000.jpg 1000w, assets/img/hero-blueprint.jpg 2000w"
-          sizes="100vw"
-          alt="Инженеры по охране труда в касках обсуждают план цеха на производстве"
-          width="2000" height="848" fetchpriority="high"
-          class="hero-slide is-active object-[78%_center] lg:object-right">
-        <img
-          src="assets/img/hero-tablet.jpg"
-          srcset="assets/img/hero-tablet-1000.jpg 1000w, assets/img/hero-tablet.jpg 2000w"
-          sizes="100vw"
-          alt="Специалист с планшетом проводит инструктаж сотрудника в цехе"
-          width="2000" height="848" fetchpriority="low" decoding="async" aria-hidden="true"
-          class="hero-slide object-[72%_center] lg:object-right">
+    <!-- ============ 2. HERO: слайдер направлений (как на expertecogroup) ============ -->
+    <!-- Фото и тексты меняются вместе, переключатели-вкладки сверху, прогресс снизу -->
+    <section id="top" class="hero relative isolate overflow-hidden bg-navy text-white" data-hero aria-roledescription="слайдер" aria-label="Направления работы">
+      <div class="hero-slides absolute inset-0 -z-20" aria-hidden="true">
         <img
           src="assets/img/hero.jpg"
           srcset="assets/img/hero-1000.jpg 1000w, assets/img/hero.jpg 2000w"
-          sizes="100vw"
-          alt="Специалисты по охране труда в защитных касках и сигнальных жилетах на промышленном объекте"
-          width="2000" height="989" fetchpriority="low" decoding="async" aria-hidden="true"
-          class="hero-slide object-[80%_center] lg:object-right">
+          sizes="100vw" alt="" width="2000" height="989" fetchpriority="high"
+          class="hero-slide is-active object-[80%_center] lg:object-right">
+        <img
+          src="assets/img/hero-tablet.jpg"
+          srcset="assets/img/hero-tablet-1000.jpg 1000w, assets/img/hero-tablet.jpg 2000w"
+          sizes="100vw" alt="" width="2000" height="848" fetchpriority="low" decoding="async"
+          class="hero-slide object-[72%_center] lg:object-right">
+        <img
+          src="assets/img/hero-blueprint.jpg"
+          srcset="assets/img/hero-blueprint-1000.jpg 1000w, assets/img/hero-blueprint.jpg 2000w"
+          sizes="100vw" alt="" width="2000" height="848" fetchpriority="low" decoding="async"
+          class="hero-slide object-[78%_center] lg:object-right">
       </div>
       <div class="hero-shade absolute inset-0 -z-10" aria-hidden="true"></div>
 
-      <div class="container-x flex min-h-[600px] flex-col justify-between pb-8 pt-10 sm:min-h-[640px] lg:min-h-[700px] lg:pb-14 lg:pt-24">
-        <div class="max-w-[660px]">
-          <p class="hero-anim text-[11.5px] font-semibold uppercase tracking-[0.05em] sm:text-[13px]">
-            <span class="text-accent-300">Обучение</span><span class="text-white/90"> • Аттестация • Безопасность</span>
-          </p>
-          <h1 class="hero-anim mt-4 text-[26px] font-bold leading-[1.2] tracking-[-0.01em] min-[400px]:text-[28px] sm:text-[42px] lg:mt-5 lg:text-[50px] lg:leading-[1.12]">
-            Охрана труда <br>и&nbsp;техника безопасности <br>для&nbsp;вашего предприятия
-          </h1>
-          <p class="hero-anim mt-5 max-w-[480px] text-[15px] leading-relaxed text-white/80 sm:text-[17px] lg:mt-6">
-            Профессиональное обучение и аттестация рабочих мест. Помогаем организациям Узбекистана обеспечивать безопасность сотрудников и&nbsp;соблюдать установленные требования.
-          </p>
-          <div class="hero-anim mt-8 flex flex-col items-start gap-3.5 sm:flex-row sm:items-center sm:gap-5 lg:mt-10">
-            <a href="#cta" data-modal-open class="btn btn-primary">Оставить заявку <i data-lucide="arrow-right"></i></a>
-            <a href="#services" class="btn btn-outline-light">Наши услуги <i data-lucide="arrow-right"></i></a>
+      <div class="hero-inner container-x flex flex-col justify-end pb-8 pt-10 lg:pb-10 lg:pt-16">
+        <div class="hero-tabs hero-anim" role="tablist" aria-label="Направления работы">
+          <button type="button" class="hero-tab is-active" role="tab" id="hero-tab-0" aria-controls="hero-pane-0" aria-selected="true">Все направления</button>
+          <button type="button" class="hero-tab" role="tab" id="hero-tab-1" aria-controls="hero-pane-1" aria-selected="false">Обучение по ОТ и ТБ</button>
+          <button type="button" class="hero-tab" role="tab" id="hero-tab-2" aria-controls="hero-pane-2" aria-selected="false">Аттестация рабочих мест</button>
+        </div>
+
+        <div class="hero-panes hero-anim mt-6 lg:mt-8">
+          <!-- Слайд 1: все направления -->
+          <div class="hero-pane is-active" id="hero-pane-0" role="tabpanel" aria-labelledby="hero-tab-0" aria-hidden="false">
+            <div class="grid items-end gap-8 lg:grid-cols-[1.5fr_.5fr] lg:gap-12">
+              <div>
+                <h1 class="hero-title">Охрана труда <br>и&nbsp;техника безопасности <br>для&nbsp;вашего предприятия</h1>
+                <p class="hero-text">Профессиональное обучение и аттестация рабочих мест. Помогаем организациям Узбекистана обеспечивать безопасность сотрудников и&nbsp;соблюдать установленные требования.</p>
+                <div class="hero-actions">
+                  <a href="#cta" data-modal-open class="btn btn-primary">Оставить заявку <i data-lucide="arrow-right"></i></a>
+                  <a href="#services" class="btn btn-outline-light">Наши услуги <i data-lucide="arrow-right"></i></a>
+                </div>
+              </div>
+              <aside class="hero-card" aria-label="Коротко о компании">
+                <p class="hero-card-eyebrow">Работаем по всему Узбекистану</p>
+                <p class="mt-2 text-[34px] font-bold leading-none tracking-[-0.01em]">с 2010 <span class="text-[0.6em] font-semibold">года</span></p>
+                <p class="mt-2 text-[14px] leading-snug text-white/75">обучение и аттестация рабочих мест для&nbsp;предприятий</p>
+                <div class="my-5 h-px bg-white/15"></div>
+                <div class="grid grid-cols-2 gap-4">
+                  <div>
+                    <p class="text-[22px] font-bold leading-none">8</p>
+                    <p class="mt-1.5 text-[13px] leading-snug text-white/75">специалистов в&nbsp;команде</p>
+                  </div>
+                  <div>
+                    <p class="text-[22px] font-bold leading-none">2</p>
+                    <p class="mt-1.5 text-[13px] leading-snug text-white/75">кандидата медицинских наук</p>
+                  </div>
+                </div>
+                <a href="#about" class="hero-card-link">О компании <i data-lucide="arrow-right"></i></a>
+              </aside>
+            </div>
+          </div>
+
+          <!-- Слайд 2: обучение -->
+          <div class="hero-pane" id="hero-pane-1" role="tabpanel" aria-labelledby="hero-tab-1" aria-hidden="true">
+            <div class="grid items-end gap-8 lg:grid-cols-[1.5fr_.5fr] lg:gap-12">
+              <div>
+                <h2 class="hero-title">Обучение по охране труда <br>и&nbsp;технике безопасности</h2>
+                <p class="hero-text">Организуем обучение сотрудников вашего предприятия: формируем учебные группы, проводим экзамен и&nbsp;оформляем документы по&nbsp;итогам.</p>
+                <div class="hero-actions">
+                  <a href="#cta" data-modal-open class="btn btn-primary">Записать сотрудников <i data-lucide="arrow-right"></i></a>
+                  <a href="#services" class="btn btn-outline-light">Подробнее об обучении <i data-lucide="arrow-right"></i></a>
+                </div>
+              </div>
+              <aside class="hero-card" aria-label="Как проходит обучение">
+                <p class="hero-card-eyebrow">Как проходит обучение</p>
+                <ul class="mt-4 space-y-3.5 text-[15px] font-medium">
+                  <li class="flex gap-3"><i data-lucide="users" class="mt-0.5 h-5 w-5 shrink-0 text-accent-300"></i>Формирование учебных групп</li>
+                  <li class="flex gap-3"><i data-lucide="clipboard-check" class="mt-0.5 h-5 w-5 shrink-0 text-accent-300"></i>Проведение экзамена</li>
+                  <li class="flex gap-3"><i data-lucide="file-check" class="mt-0.5 h-5 w-5 shrink-0 text-accent-300"></i>Оформление документов по&nbsp;итогам</li>
+                </ul>
+                <a href="#services" class="hero-card-link">Об услуге <i data-lucide="arrow-right"></i></a>
+              </aside>
+            </div>
+          </div>
+
+          <!-- Слайд 3: аттестация -->
+          <div class="hero-pane" id="hero-pane-2" role="tabpanel" aria-labelledby="hero-tab-2" aria-hidden="true">
+            <div class="grid items-end gap-8 lg:grid-cols-[1.5fr_.5fr] lg:gap-12">
+              <div>
+                <h2 class="hero-title">Аттестация <br>рабочих мест</h2>
+                <p class="hero-text">Выезжаем на&nbsp;объект заказчика, проводим необходимые замеры, готовим отчёт и&nbsp;сопровождаем документацию.</p>
+                <div class="hero-actions">
+                  <a href="#cta" data-modal-open class="btn btn-primary">Заказать аттестацию <i data-lucide="arrow-right"></i></a>
+                  <a href="#services" class="btn btn-outline-light">Подробнее об аттестации <i data-lucide="arrow-right"></i></a>
+                </div>
+              </div>
+              <aside class="hero-card" aria-label="Что входит в аттестацию">
+                <p class="hero-card-eyebrow">Что входит</p>
+                <ul class="mt-4 space-y-3.5 text-[15px] font-medium">
+                  <li class="flex gap-3"><i data-lucide="map-pin" class="mt-0.5 h-5 w-5 shrink-0 text-accent-300"></i>Выезд на&nbsp;объект заказчика</li>
+                  <li class="flex gap-3"><i data-lucide="ruler" class="mt-0.5 h-5 w-5 shrink-0 text-accent-300"></i>Необходимые замеры</li>
+                  <li class="flex gap-3"><i data-lucide="file-check" class="mt-0.5 h-5 w-5 shrink-0 text-accent-300"></i>Отчёт и&nbsp;сопровождение документов</li>
+                </ul>
+                <a href="#services" class="hero-card-link">Об услуге <i data-lucide="arrow-right"></i></a>
+              </aside>
+            </div>
           </div>
         </div>
 
-        <div class="hero-anim mt-12 flex flex-col gap-7 lg:flex-row lg:items-end lg:justify-between">
-        <dl class="grid grid-cols-2 gap-4 sm:max-w-[600px] sm:gap-10">
-          <div class="flex items-center gap-3">
-            <span class="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-white/35 sm:h-12 sm:w-12"><i data-lucide="shield-check" class="h-5 w-5"></i></span>
-            <div>
-              <dt class="text-[13px] font-semibold sm:text-[15px]">С 2010 года</dt>
-              <dd class="text-[11.5px] leading-snug text-white/70 sm:text-[13px]">на рынке образовательных услуг</dd>
-            </div>
-          </div>
-          <div class="flex items-center gap-3">
-            <span class="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-white/35 sm:h-12 sm:w-12"><i data-lucide="map-pin" class="h-5 w-5"></i></span>
-            <div>
-              <dt class="text-[13px] font-semibold leading-snug sm:text-[15px]">Работаем по всему <br>Узбекистану</dt>
-            </div>
-          </div>
-        </dl>
-          <div class="hero-dots flex items-center gap-2.5" role="group" aria-label="Переключение слайдов">
-            <button type="button" class="hero-dot is-active" aria-label="Слайд 1 из 3" aria-current="true"><span class="hero-dot-bar"></span></button>
-            <button type="button" class="hero-dot" aria-label="Слайд 2 из 3" aria-current="false"><span class="hero-dot-bar"></span></button>
-            <button type="button" class="hero-dot" aria-label="Слайд 3 из 3" aria-current="false"><span class="hero-dot-bar"></span></button>
-          </div>
+        <!-- Индикатор: текущий слайд и отсчёт до автопрокрутки -->
+        <div class="hero-status hero-anim" aria-hidden="true">
+          <span class="hero-status__bar is-active"><i></i></span>
+          <span class="hero-status__bar"><i></i></span>
+          <span class="hero-status__bar"><i></i></span>
         </div>
       </div>
     </section>

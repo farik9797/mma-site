@@ -40,13 +40,19 @@
   updateNav();
   window.addEventListener('scroll', () => { if (!spyTick) { spyTick = true; requestAnimationFrame(updateNav); } }, { passive: true });
 
-  // Hero-слайдер: автосмена фона, пауза при наведении/фокусе и в скрытой вкладке, точки, свайп
-  const hero = document.getElementById('top');
+  // Hero-слайдер (по образцу expertecogroup): фото и тексты меняются вместе.
+  // Автосмена каждые 5 с; вкладки, стрелки клавиатуры и свайп — вручную. Пауза: наведение на
+  // вкладки, фокус с клавиатуры внутри hero, фоновая вкладка. При prefers-reduced-motion не листает.
+  const hero = document.querySelector('[data-hero]');
+  const tabs = hero ? [...hero.querySelectorAll('.hero-tab')] : [];
+  const panes = hero ? [...hero.querySelectorAll('.hero-pane')] : [];
   const slides = hero ? [...hero.querySelectorAll('.hero-slide')] : [];
-  const dots = hero ? [...hero.querySelectorAll('.hero-dot')] : [];
-  if (slides.length > 1) {
-    const DURATION = 6500;
+  const bars = hero ? [...hero.querySelectorAll('.hero-status__bar')] : [];
+  if (panes.length > 1) {
+    const DURATION = 5000;
+    const total = panes.length;
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    hero.style.setProperty('--slide-dur', DURATION + 'ms');
     let current = 0;
     let timer = null;
     let startedAt = 0;
@@ -57,31 +63,43 @@
     const isBlocked = () => reduceMotion.matches || document.hidden || hovered || focused;
     const schedule = (ms) => {
       clearTimeout(timer);
+      timer = null;
       if (isBlocked()) return;
       startedAt = performance.now();
       remaining = ms;
-      timer = setTimeout(() => goTo(current + 1), ms);
+      timer = setTimeout(() => go(current + 1, 1), ms);
     };
-    const restartBar = (dot) => {
-      const bar = dot.querySelector('.hero-dot-bar');
-      bar.style.animation = 'none';
-      void bar.offsetWidth;
-      bar.style.animation = '';
-    };
-    const goTo = (n) => {
-      current = (n + slides.length) % slides.length;
-      slides.forEach((s, i) => {
-        s.classList.toggle('is-active', i === current);
-        s.setAttribute('aria-hidden', String(i !== current));
-      });
-      dots.forEach((d, i) => {
-        d.classList.toggle('is-active', i === current);
-        d.setAttribute('aria-current', String(i === current));
-      });
-      restartBar(dots[current]);
-      remaining = DURATION; // новый слайд — отсчёт с начала (даже если сейчас пауза)
+    const mark = (list, i) => list.forEach((el, k) => el.classList.toggle('is-active', k === i));
+
+    const go = (n, dir) => {
+      n = (n + total) % total;
+      if (n === current) return;
+      const from = panes[current];
+      const to = panes[n];
+      // входящий слайд ставим за краем без анимации, затем отпускаем в нулевую позицию
+      to.style.transition = 'none';
+      to.style.transform = `translateX(${dir * 100}%)`;
+      to.style.opacity = '0';
+      void to.offsetWidth;
+      to.style.transition = '';
+      to.style.transform = 'translateX(0)';
+      to.style.opacity = '1';
+      from.style.transform = `translateX(${-dir * 100}%)`;
+      from.style.opacity = '0';
+
+      current = n;
+      mark(panes, n);
+      mark(slides, n);
+      mark(tabs, n);
+      bars.forEach((b, k) => { b.classList.toggle('is-done', k < n); b.classList.remove('is-active'); });
+      if (bars[n]) { void bars[n].offsetWidth; bars[n].classList.add('is-active'); }
+      tabs.forEach((t, k) => t.setAttribute('aria-selected', String(k === n)));
+      panes.forEach((p, k) => { p.setAttribute('aria-hidden', String(k !== n)); p.inert = k !== n; });
+      remaining = DURATION; // новый слайд — отсчёт с начала
       schedule(DURATION);
     };
+    panes.forEach((p, k) => { p.inert = k !== current; });
+
     const pause = () => {
       if (timer) remaining = Math.max(0, remaining - (performance.now() - startedAt));
       clearTimeout(timer);
@@ -94,25 +112,40 @@
       schedule(remaining || DURATION);
     };
 
-    dots.forEach((d, i) => d.addEventListener('click', () => goTo(i)));
-    // Пауза только при наведении/фокусе на кнопки-точки (мышь; касание на телефоне не останавливает)
-    const dotsBox = hero.querySelector('.hero-dots');
-    dotsBox.addEventListener('pointerenter', (e) => { if (e.pointerType === 'mouse') { hovered = true; pause(); } });
-    dotsBox.addEventListener('pointerleave', (e) => { if (e.pointerType === 'mouse') { hovered = false; resume(); } });
-    // Фокус ставит паузу только при навигации с клавиатуры (после клика мышью кнопка тоже в фокусе)
-    dotsBox.addEventListener('focusin', (e) => { if (e.target.matches(':focus-visible')) { focused = true; pause(); } });
-    dotsBox.addEventListener('focusout', (e) => { if (!dotsBox.contains(e.relatedTarget)) { focused = false; resume(); } });
+    tabs.forEach((t, i) => t.addEventListener('click', () => go(i, i > current ? 1 : -1)));
+    hero.querySelector('.hero-tabs').addEventListener('keydown', (e) => {
+      if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+      e.preventDefault();
+      const dir = e.key === 'ArrowRight' ? 1 : -1;
+      go(current + dir, dir);
+      tabs[current].focus();
+    });
+
+    // Пауза при наведении мыши на вкладки (касание на телефоне не останавливает)
+    const tabsBox = hero.querySelector('.hero-tabs');
+    tabsBox.addEventListener('pointerenter', (e) => { if (e.pointerType === 'mouse') { hovered = true; pause(); } });
+    tabsBox.addEventListener('pointerleave', (e) => { if (e.pointerType === 'mouse') { hovered = false; resume(); } });
+    // Фокус с клавиатуры внутри hero — пауза, чтобы слайд не уехал из-под фокуса (клик мышью не считается)
+    hero.addEventListener('focusin', (e) => { if (e.target.matches(':focus-visible')) { focused = true; pause(); } });
+    hero.addEventListener('focusout', (e) => { if (!hero.contains(e.relatedTarget)) { focused = false; resume(); } });
     document.addEventListener('visibilitychange', () => (document.hidden ? pause() : resume()));
 
-    // Свайп на сенсорных экранах
-    let touchX = null;
-    hero.addEventListener('touchstart', (e) => { touchX = e.touches[0].clientX; }, { passive: true });
-    hero.addEventListener('touchend', (e) => {
-      if (touchX === null) return;
-      const dx = e.changedTouches[0].clientX - touchX;
-      if (Math.abs(dx) > 50) goTo(current + (dx < 0 ? 1 : -1));
-      touchX = null;
-    }, { passive: true });
+    // Свайп пальцем/стилусом: мышью листают вкладками, протяжка мышью — это выделение текста
+    let sx = 0;
+    let sy = 0;
+    let tracking = false;
+    hero.addEventListener('pointerdown', (e) => {
+      if (e.pointerType === 'mouse') return;
+      sx = e.clientX; sy = e.clientY; tracking = true;
+    });
+    hero.addEventListener('pointerup', (e) => {
+      if (!tracking) return;
+      tracking = false;
+      const dx = e.clientX - sx;
+      const dy = e.clientY - sy;
+      if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.2) go(current + (dx < 0 ? 1 : -1), dx < 0 ? 1 : -1);
+    });
+    hero.addEventListener('pointercancel', () => { tracking = false; });
 
     schedule(DURATION);
   }
