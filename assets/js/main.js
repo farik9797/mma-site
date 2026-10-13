@@ -191,8 +191,7 @@
   gsap.registerPlugin(ScrollTrigger);
   gsap.matchMedia().add('(prefers-reduced-motion: no-preference)', () => {
     gsap.from('.hero-anim', { y: 24, opacity: 0, duration: 0.8, ease: 'power3.out', stagger: 0.08 });
-    gsap.from('.hero-art', { y: 30, opacity: 0, duration: 1.1, ease: 'power3.out', delay: 0.15 });
-    gsap.from('.hero-strip', { y: 24, opacity: 0, duration: 0.9, ease: 'power3.out', delay: 0.45 });
+    gsap.from('.hero-img', { scale: 1.05, opacity: 0, duration: 1.4, ease: 'power2.out' });
 
     gsap.set('[data-reveal]', { y: 28, opacity: 0 });
     ScrollTrigger.batch('[data-reveal]', {

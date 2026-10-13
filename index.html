@@ -84,34 +84,17 @@
       .footer-link { @apply text-[14px] text-white/70 transition-colors hover:text-white; }
 
       /* Затемнение фото: на мобильном — по всей площади, на десктопе — только слева под текстом */
-      .hero-shade { background: linear-gradient(90deg, rgba(16,43,70,0.96) 0%, rgba(16,43,70,0.86) 55%, rgba(16,43,70,0.6) 100%); }
+      .hero-shade { background: linear-gradient(90deg, rgba(16,43,70,0.95) 0%, rgba(16,43,70,0.82) 60%, rgba(16,43,70,0.55) 100%); }
       .why-shade { background: linear-gradient(90deg, #102B46 0%, #102B46 54%, rgba(16,43,70,0.7) 64%, rgba(16,43,70,0.35) 80%, rgba(16,43,70,0.2) 100%); }
       .cta-shade { background: linear-gradient(90deg, #0C2238 0%, #0C2238 22%, rgba(12,34,56,0.55) 36%, rgba(12,34,56,0.55) 52%, #0C2238 64%); }
       @media (min-width: 1024px) {
-        .hero-shade { background: linear-gradient(90deg, #102B46 0%, #102B46 36%, rgba(16,43,70,0.84) 46%, rgba(16,43,70,0.3) 60%, rgba(16,43,70,0) 72%); }
+        .hero-shade { background: linear-gradient(90deg, rgba(16,43,70,0.92) 0%, rgba(16,43,70,0.8) 30%, rgba(16,43,70,0.45) 48%, rgba(16,43,70,0) 64%); }
       }
 
       .news-track { scrollbar-width: none; }
       .news-track::-webkit-scrollbar { display: none; }
 
       #site-header.is-scrolled { @apply border-line shadow-[0_10px_30px_-20px_rgba(16,43,70,0.35)]; }
-
-      /* Hero: фото в ромбах (повёрнутый квадрат + контр-поворот картинки) */
-      .hero-art-wrap { @apply relative; }
-      .hero-art { position: relative; height: 380px; --d: 240px; --cx: 52%; --cy: 185px; }
-      .dia { position: absolute; width: var(--d); height: var(--d); left: calc(var(--cx) - var(--d) / 2); top: calc(var(--cy) - var(--d) / 2); transform: rotate(45deg); border-radius: calc(var(--d) * 0.13); overflow: hidden; }
-      .dia > img { position: absolute; width: 142%; height: 142%; max-width: none; left: -21%; top: -21%; transform: rotate(-45deg); object-fit: cover; }
-      .dia-frame { background: #102B46; translate: calc(var(--d) * 0.07) calc(var(--d) * -0.07); }
-      .dia-main { box-shadow: 0 40px 80px -40px rgba(16, 43, 70, 0.6); }
-      .dia-small { --s: calc(var(--d) * 0.44); width: var(--s); height: var(--s); left: calc(var(--cx) - var(--d) * 0.8); top: calc(var(--cy) + var(--d) * 0.1); border-radius: calc(var(--s) * 0.16); outline: 5px solid #fff; box-shadow: 0 24px 50px -24px rgba(16, 43, 70, 0.6); }
-      .hero-badge { position: absolute; width: calc(var(--d) * 0.24); height: calc(var(--d) * 0.24); left: calc(var(--cx) - var(--d) * 0.44); top: calc(var(--cy) - var(--d) * 0.36); }
-      @media (min-width: 640px) { .hero-art { height: 480px; --d: 320px; --cy: 235px; } }
-      @media (min-width: 1024px) {
-        .hero-art { height: 560px; --d: 400px; --cx: 56%; --cy: 270px; }
-        .hero-strip { position: absolute; bottom: 0; left: 16%; right: -12px; }
-        .hero-art-wrap { min-height: 600px; }
-      }
-      @media (min-width: 1280px) { .hero-art { --d: 430px; --cy: 285px; height: 590px; } .hero-art-wrap { min-height: 630px; } }
 
       /* Попап заявки: нативный <dialog>; на мобильном — нижняя шторка */
       .modal {
@@ -193,67 +176,49 @@
   </header>
 
   <main id="main">
-    <!-- ============ 2. HERO (структура по референсу: заголовок слева, фото-ромбы справа, полоса направлений) ============ -->
-    <section id="top" class="relative isolate overflow-hidden bg-white">
-      <div class="pointer-events-none absolute -left-40 -top-56 -z-10 h-[520px] w-[520px] rotate-45 rounded-[72px] bg-mist" aria-hidden="true"></div>
-      <div class="pointer-events-none absolute -bottom-40 left-[30%] -z-10 hidden h-[360px] w-[360px] rotate-45 rounded-[56px] bg-mist/70 lg:block" aria-hidden="true"></div>
+    <!-- ============ 2. HERO ============ -->
+    <section id="top" class="relative isolate overflow-hidden bg-navy text-white">
+      <img
+        src="assets/img/hero.jpg"
+        srcset="assets/img/hero-1000.jpg 1000w, assets/img/hero.jpg 2000w"
+        sizes="100vw"
+        alt="Специалисты по охране труда в защитных касках и сигнальных жилетах на промышленном объекте"
+        width="2000" height="989" fetchpriority="high"
+        class="hero-img absolute inset-0 -z-20 h-full w-full object-cover object-[80%_center] lg:object-right">
+      <div class="hero-shade absolute inset-0 -z-10" aria-hidden="true"></div>
 
-      <div class="container-x grid items-center gap-8 pb-12 pt-10 lg:grid-cols-[1fr_1.05fr] lg:gap-4 lg:pb-14 lg:pt-12">
-        <div class="max-w-[580px]">
-          <p class="hero-anim inline-flex items-center gap-2 rounded-full bg-navy px-4 py-2 text-[12.5px] font-semibold text-white sm:text-[13px]">
-            <i data-lucide="map-pin" class="h-4 w-4 text-accent-300"></i>Работаем по всему Узбекистану
+      <div class="container-x flex min-h-[600px] flex-col justify-between pb-8 pt-10 sm:min-h-[640px] lg:min-h-[700px] lg:pb-14 lg:pt-24">
+        <div class="max-w-[660px]">
+          <p class="hero-anim text-[11.5px] font-semibold uppercase tracking-[0.05em] sm:text-[13px]">
+            <span class="text-accent-300">Обучение</span><span class="text-white/90"> • Аттестация • Безопасность</span>
           </p>
-          <h1 class="hero-anim mt-6 font-extrabold uppercase leading-[0.98] tracking-[-0.02em]">
-            <span class="block text-[38px] text-navy sm:text-[54px] lg:text-[58px] xl:text-[66px]">Охрана труда</span>
-            <span class="block text-[38px] text-accent sm:text-[54px] lg:text-[58px] xl:text-[66px]">и&nbsp;техника <br>безопасности</span>
-            <span class="mt-5 flex items-center normal-case tracking-normal">
-              <span class="rounded-full bg-navy px-5 py-2.5 text-[13px] font-bold uppercase tracking-[0.04em] text-white sm:text-[15px]">для&nbsp;вашего предприятия</span>
-              <span class="h-[2px] w-10 bg-navy sm:w-16" aria-hidden="true"></span>
-              <span class="h-2 w-2 rounded-full bg-navy" aria-hidden="true"></span>
-            </span>
+          <h1 class="hero-anim mt-4 text-[26px] font-bold leading-[1.2] tracking-[-0.01em] min-[400px]:text-[28px] sm:text-[42px] lg:mt-5 lg:text-[50px] lg:leading-[1.12]">
+            Охрана труда <br>и&nbsp;техника безопасности <br>для&nbsp;вашего предприятия
           </h1>
-          <p class="hero-anim mt-6 max-w-[500px] text-[15.5px] leading-relaxed text-muted sm:text-[17px]">
-            Профессиональное <b class="font-semibold text-accent">обучение и&nbsp;аттестация рабочих мест</b>. Помогаем организациям Узбекистана обеспечивать <b class="font-semibold text-accent">безопасность сотрудников</b> и&nbsp;соблюдать установленные требования.
+          <p class="hero-anim mt-5 max-w-[480px] text-[15px] leading-relaxed text-white/80 sm:text-[17px] lg:mt-6">
+            Профессиональное обучение и аттестация рабочих мест. Помогаем организациям Узбекистана обеспечивать безопасность сотрудников и&nbsp;соблюдать установленные требования.
           </p>
-          <div class="hero-anim mt-8 flex flex-col items-start gap-3.5 sm:flex-row sm:items-center sm:gap-4">
+          <div class="hero-anim mt-8 flex flex-col items-start gap-3.5 sm:flex-row sm:items-center sm:gap-5 lg:mt-10">
             <a href="#cta" data-modal-open class="btn btn-primary">Оставить заявку <i data-lucide="arrow-right"></i></a>
-            <a href="#services" class="btn border border-navy/20 text-navy hover:border-accent hover:text-accent">Наши услуги <i data-lucide="arrow-right"></i></a>
+            <a href="#services" class="btn btn-outline-light">Наши услуги <i data-lucide="arrow-right"></i></a>
           </div>
         </div>
 
-        <div class="hero-art-wrap">
-          <div class="hero-art" aria-hidden="true">
-            <div class="dia dia-frame"></div>
-            <div class="dia dia-main">
-              <img src="https://images.unsplash.com/photo-1715966743489-0ac1138420a5?auto=format&fit=crop&w=1200&q=80" alt="" width="1200" height="800" fetchpriority="high">
+        <dl class="hero-anim mt-12 grid grid-cols-2 gap-4 sm:max-w-[600px] sm:gap-10">
+          <div class="flex items-center gap-3">
+            <span class="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-white/35 sm:h-12 sm:w-12"><i data-lucide="shield-check" class="h-5 w-5"></i></span>
+            <div>
+              <dt class="text-[13px] font-semibold sm:text-[15px]">С 2010 года</dt>
+              <dd class="text-[11.5px] leading-snug text-white/70 sm:text-[13px]">на рынке образовательных услуг</dd>
             </div>
-            <div class="dia dia-small">
-              <img src="https://images.unsplash.com/photo-1588011930968-eadac80e6a5a?auto=format&fit=crop&w=600&q=80" alt="" width="600" height="400">
-            </div>
-            <span class="hero-badge grid place-items-center rounded-2xl bg-white text-accent shadow-[0_20px_44px_-16px_rgba(23,105,194,0.55)]">
-              <i data-lucide="shield-check" class="h-1/2 w-1/2" stroke-width="1.75"></i>
-            </span>
           </div>
-
-          <ul class="hero-strip relative -mt-12 grid grid-cols-2 gap-y-6 rounded-xl bg-navy px-3 py-6 sm:-mt-16 lg:mt-0 text-white shadow-[0_30px_60px_-30px_rgba(16,43,70,0.7)] sm:grid-cols-4 sm:gap-y-0 sm:divide-x sm:divide-white/15">
-            <li class="flex flex-col items-center gap-2.5 px-2 text-center">
-              <i data-lucide="graduation-cap" class="h-7 w-7 text-accent-300" stroke-width="1.5"></i>
-              <span class="text-[13px] font-semibold leading-tight">Обучение <br>по ОТ и ТБ</span>
-            </li>
-            <li class="flex flex-col items-center gap-2.5 px-2 text-center">
-              <i data-lucide="clipboard-check" class="h-7 w-7 text-accent-300" stroke-width="1.5"></i>
-              <span class="text-[13px] font-semibold leading-tight">Аттестация <br>рабочих мест</span>
-            </li>
-            <li class="flex flex-col items-center gap-2.5 px-2 text-center">
-              <i data-lucide="ruler" class="h-7 w-7 text-accent-300" stroke-width="1.5"></i>
-              <span class="text-[13px] font-semibold leading-tight">Замеры <br>на объекте</span>
-            </li>
-            <li class="flex flex-col items-center gap-2.5 px-2 text-center">
-              <i data-lucide="file-check" class="h-7 w-7 text-accent-300" stroke-width="1.5"></i>
-              <span class="text-[13px] font-semibold leading-tight">Оформление <br>документов</span>
-            </li>
-          </ul>
-        </div>
+          <div class="flex items-center gap-3">
+            <span class="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-white/35 sm:h-12 sm:w-12"><i data-lucide="map-pin" class="h-5 w-5"></i></span>
+            <div>
+              <dt class="text-[13px] font-semibold leading-snug sm:text-[15px]">Работаем по всему <br>Узбекистану</dt>
+            </div>
+          </div>
+        </dl>
       </div>
     </section>
 
@@ -412,9 +377,9 @@
     <!-- ============ 7. ПОЧЕМУ ВЫБИРАЮТ НАС ============ -->
     <section id="advantages" class="bg-mist px-4 pb-14 sm:px-6 lg:bg-navy lg:p-0">
       <div class="relative isolate overflow-hidden rounded-2xl bg-navy text-white lg:rounded-none">
-        <img src="https://images.unsplash.com/photo-1737874960921-d1205a4f55da?auto=format&fit=crop&w=1400&q=80"
-             alt="" width="1400" height="933" loading="lazy" aria-hidden="true"
-             class="absolute inset-y-0 right-0 -z-20 hidden h-full w-[46%] object-cover object-[88%_30%] lg:block">
+        <img src="assets/img/hero.jpg"
+             alt="" width="2000" height="989" loading="lazy" aria-hidden="true"
+             class="absolute inset-y-0 right-0 -z-20 hidden h-full w-[46%] object-cover object-[95%_30%] lg:block">
         <div class="why-shade absolute inset-0 -z-10 hidden lg:block" aria-hidden="true"></div>
 
         <div class="container-x px-5 py-8 sm:px-8 lg:px-8 lg:py-20">
