@@ -172,6 +172,7 @@
       .svc-facts { @apply grid grid-cols-3 divide-x divide-line rounded-xl bg-mist py-4 text-center; }
       .svc-facts dt { @apply text-[20px] font-bold leading-none text-navy sm:text-[22px]; }
       .svc-facts dd { @apply mt-1.5 px-2 text-[12.5px] leading-snug text-muted sm:text-[13px]; }
+      .news-draft { @apply flex gap-3 rounded-xl border border-dashed border-line bg-mist p-4 text-[14px] leading-relaxed text-muted; }
       .svc-footer { @apply sticky bottom-0 z-10 flex flex-col gap-3 border-t border-line bg-white px-6 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-9; }
       .field-error { @apply mt-1.5 text-[13px] text-[#B42318]; }
       .btn:active { @apply scale-[0.98]; }
@@ -568,33 +569,33 @@
 
         <div class="news-track -mx-4 mt-7 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-4 sm:-mx-6 sm:px-6 lg:mx-0 lg:mt-10 lg:grid lg:grid-cols-3 lg:gap-8 lg:overflow-visible lg:px-0 lg:pb-0">
           <article class="card w-[84%] shrink-0 snap-start sm:w-[46%] lg:w-auto" data-reveal>
-            <a href="#" class="card-media block aspect-[2.4/1]" tabindex="-1" aria-hidden="true">
+            <a href="#news" data-news-open="questions" class="card-media block aspect-[2.4/1]" tabindex="-1" aria-hidden="true">
               <img src="https://images.unsplash.com/photo-1768158988512-ad31657fe5b8?auto=format&fit=crop&w=800&q=80" alt="" width="800" height="333" loading="lazy">
             </a>
             <div class="flex flex-1 flex-col p-5 lg:p-6">
               <time class="text-[12.5px] text-muted">дд.мм.гггг</time>
-              <h3 class="mt-2 text-[15.5px] font-semibold leading-snug text-navy lg:text-[16px]"><a href="#" class="transition-colors hover:text-accent">Актуальные вопросы <br>охраны труда</a></h3>
-              <a href="#" class="link-arrow mt-auto pt-4 text-[14px]" aria-label="Подробнее: Актуальные вопросы охраны труда">Подробнее <i data-lucide="arrow-right"></i></a>
+              <h3 class="mt-2 text-[15.5px] font-semibold leading-snug text-navy lg:text-[16px]"><a href="#news" data-news-open="questions" aria-haspopup="dialog" class="transition-colors hover:text-accent">Актуальные вопросы <br>охраны труда</a></h3>
+              <a href="#news" data-news-open="questions" aria-haspopup="dialog" class="link-arrow mt-auto pt-4 text-[14px]" aria-label="Подробнее: Актуальные вопросы охраны труда">Подробнее <i data-lucide="arrow-right"></i></a>
             </div>
           </article>
           <article class="card w-[84%] shrink-0 snap-start sm:w-[46%] lg:w-auto" data-reveal>
-            <a href="#" class="card-media block aspect-[2.4/1]" tabindex="-1" aria-hidden="true">
+            <a href="#news" data-news-open="preparation" class="card-media block aspect-[2.4/1]" tabindex="-1" aria-hidden="true">
               <img src="https://images.unsplash.com/photo-1758691736498-422201cc57da?auto=format&fit=crop&w=800&q=80" alt="" width="800" height="333" loading="lazy">
             </a>
             <div class="flex flex-1 flex-col p-5 lg:p-6">
               <time class="text-[12.5px] text-muted">дд.мм.гггг</time>
-              <h3 class="mt-2 text-[15.5px] font-semibold leading-snug text-navy lg:text-[16px]"><a href="#" class="transition-colors hover:text-accent">Подготовка сотрудников <br>к&nbsp;обучению и&nbsp;проверке знаний</a></h3>
-              <a href="#" class="link-arrow mt-auto pt-4 text-[14px]" aria-label="Подробнее: Подготовка сотрудников к обучению и проверке знаний">Подробнее <i data-lucide="arrow-right"></i></a>
+              <h3 class="mt-2 text-[15.5px] font-semibold leading-snug text-navy lg:text-[16px]"><a href="#news" data-news-open="preparation" aria-haspopup="dialog" class="transition-colors hover:text-accent">Подготовка сотрудников <br>к&nbsp;обучению и&nbsp;проверке знаний</a></h3>
+              <a href="#news" data-news-open="preparation" aria-haspopup="dialog" class="link-arrow mt-auto pt-4 text-[14px]" aria-label="Подробнее: Подготовка сотрудников к обучению и проверке знаний">Подробнее <i data-lucide="arrow-right"></i></a>
             </div>
           </article>
           <article class="card w-[84%] shrink-0 snap-start sm:w-[46%] lg:w-auto" data-reveal>
-            <a href="#" class="card-media block aspect-[2.4/1]" tabindex="-1" aria-hidden="true">
+            <a href="#news" data-news-open="attestation" class="card-media block aspect-[2.4/1]" tabindex="-1" aria-hidden="true">
               <img src="https://images.unsplash.com/photo-1549923746-9507eec27243?auto=format&fit=crop&w=800&q=80" alt="" width="800" height="333" loading="lazy">
             </a>
             <div class="flex flex-1 flex-col p-5 lg:p-6">
               <time class="text-[12.5px] text-muted">дд.мм.гггг</time>
-              <h3 class="mt-2 text-[15.5px] font-semibold leading-snug text-navy lg:text-[16px]"><a href="#" class="transition-colors hover:text-accent">Аттестация рабочих мест: <br>этапы и&nbsp;документация</a></h3>
-              <a href="#" class="link-arrow mt-auto pt-4 text-[14px]" aria-label="Подробнее: Аттестация рабочих мест: этапы и документация">Подробнее <i data-lucide="arrow-right"></i></a>
+              <h3 class="mt-2 text-[15.5px] font-semibold leading-snug text-navy lg:text-[16px]"><a href="#news" data-news-open="attestation" aria-haspopup="dialog" class="transition-colors hover:text-accent">Аттестация рабочих мест: <br>этапы и&nbsp;документация</a></h3>
+              <a href="#news" data-news-open="attestation" aria-haspopup="dialog" class="link-arrow mt-auto pt-4 text-[14px]" aria-label="Подробнее: Аттестация рабочих мест: этапы и документация">Подробнее <i data-lucide="arrow-right"></i></a>
             </div>
           </article>
         </div>
@@ -900,6 +901,105 @@
       <div class="svc-footer">
         <p class="text-[14px] text-muted">Стоимость и сроки&nbsp;— <span class="font-semibold text-navy">по запросу</span></p>
         <button type="button" data-service-cta="Аттестация рабочих мест" class="btn btn-primary w-full sm:w-auto">Оставить заявку <i data-lucide="arrow-right"></i></button>
+      </div>
+    </article>
+  </dialog>
+
+  <!-- ============ ПОПАП «НОВОСТИ И ПОЛЕЗНЫЕ МАТЕРИАЛЫ» ============ -->
+  <!-- Лендинг: материалы открываются попапом. Бриф: не выдумывать новости, даты и изменения законодательства —
+       здесь только темы и этапы работ из брифа, полный текст и дата — от клиента. -->
+  <dialog id="news-modal" class="modal modal-wide" aria-labelledby="news-title-questions">
+    <div class="sticky top-0 z-20 flex h-0 justify-end">
+      <button type="button" data-modal-close class="mr-3 mt-3 grid h-10 w-10 shrink-0 cursor-pointer place-items-center rounded-full bg-white/90 text-navy shadow-[0_6px_18px_-8px_rgba(16,43,70,0.5)] transition-colors hover:bg-white" aria-label="Закрыть">
+        <i data-lucide="x" class="h-5 w-5"></i>
+      </button>
+    </div>
+
+    <article data-news-panel="questions">
+      <div class="aspect-[2.4/1] overflow-hidden bg-mist sm:aspect-[3.2/1]">
+        <img src="https://images.unsplash.com/photo-1768158988512-ad31657fe5b8?auto=format&fit=crop&w=1200&q=80" alt="" width="1200" height="500" loading="lazy" class="h-full w-full object-cover">
+      </div>
+      <div class="p-6 sm:p-9">
+        <p class="flex items-center gap-2.5"><span class="eyebrow">Полезные материалы</span><span class="text-line" aria-hidden="true">|</span><time class="text-[13px] text-muted">дд.мм.гггг</time></p>
+        <h2 id="news-title-questions" class="mt-2 text-[22px] font-bold leading-tight text-navy sm:text-[28px]">Актуальные вопросы охраны труда</h2>
+        <p class="mt-3 text-[15.5px] leading-relaxed text-muted">Темы, с&nbsp;которыми предприятие работает в&nbsp;сфере охраны труда: обучение сотрудников, проверка знаний, аттестация рабочих мест и&nbsp;документация.</p>
+
+        <div class="mt-7">
+          <h3 class="svc-h">О чём материал</h3>
+          <ul class="mt-4 space-y-3 text-[15px] text-ink">
+              <li class="flex gap-3"><i data-lucide="circle-check" class="mt-0.5 h-[18px] w-[18px] shrink-0 text-accent"></i>Обучение сотрудников по&nbsp;охране труда и&nbsp;технике безопасности</li>
+              <li class="flex gap-3"><i data-lucide="circle-check" class="mt-0.5 h-[18px] w-[18px] shrink-0 text-accent"></i>Проверка знаний и&nbsp;экзамен</li>
+              <li class="flex gap-3"><i data-lucide="circle-check" class="mt-0.5 h-[18px] w-[18px] shrink-0 text-accent"></i>Аттестация рабочих мест и&nbsp;замеры на&nbsp;объекте</li>
+              <li class="flex gap-3"><i data-lucide="circle-check" class="mt-0.5 h-[18px] w-[18px] shrink-0 text-accent"></i>Отчётная документация и&nbsp;её сопровождение</li>
+            </ul>
+        </div>
+
+        <div class="news-draft mt-8">
+          <i data-lucide="file-pen-line" class="mt-0.5 h-5 w-5 shrink-0 text-accent"></i>
+          <p>Полный текст материала&nbsp;— <span class="font-semibold text-navy">[уточнить у&nbsp;клиента]</span>. Здесь будет статья: текст с&nbsp;подзаголовками, при необходимости&nbsp;— фото и&nbsp;файлы для&nbsp;скачивания.</p>
+        </div>
+      </div>
+      <div class="svc-footer">
+        <p class="text-[14px] text-muted">Остались вопросы? <span class="font-semibold text-navy">Проконсультируем</span></p>
+        <button type="button" data-news-cta="" class="btn btn-primary w-full sm:w-auto">Получить консультацию <i data-lucide="arrow-right"></i></button>
+      </div>
+    </article>
+    <article data-news-panel="preparation" hidden>
+      <div class="aspect-[2.4/1] overflow-hidden bg-mist sm:aspect-[3.2/1]">
+        <img src="https://images.unsplash.com/photo-1758691736498-422201cc57da?auto=format&fit=crop&w=1200&q=80" alt="" width="1200" height="500" loading="lazy" class="h-full w-full object-cover">
+      </div>
+      <div class="p-6 sm:p-9">
+        <p class="flex items-center gap-2.5"><span class="eyebrow">Полезные материалы</span><span class="text-line" aria-hidden="true">|</span><time class="text-[13px] text-muted">дд.мм.гггг</time></p>
+        <h2 id="news-title-preparation" class="mt-2 text-[22px] font-bold leading-tight text-navy sm:text-[28px]">Подготовка сотрудников к&nbsp;обучению и&nbsp;проверке знаний</h2>
+        <p class="mt-3 text-[15.5px] leading-relaxed text-muted">Как устроено обучение по&nbsp;охране труда в&nbsp;Modern Medicine Alliance&nbsp;— от&nbsp;формирования учебных групп до&nbsp;документов по&nbsp;итогам экзамена.</p>
+
+        <div class="mt-7">
+          <h3 class="svc-h">Этапы обучения</h3>
+          <ol class="mt-4 space-y-3 text-[15px] text-ink">
+              <li class="flex gap-3"><span class="svc-num">1</span>Формирование учебных групп</li>
+              <li class="flex gap-3"><span class="svc-num">2</span>Обучение сотрудников</li>
+              <li class="flex gap-3"><span class="svc-num">3</span>Проведение экзамена</li>
+              <li class="flex gap-3"><span class="svc-num">4</span>Оформление документов по&nbsp;итогам обучения</li>
+            </ol>
+        </div>
+
+        <div class="news-draft mt-8">
+          <i data-lucide="file-pen-line" class="mt-0.5 h-5 w-5 shrink-0 text-accent"></i>
+          <p>Полный текст материала&nbsp;— <span class="font-semibold text-navy">[уточнить у&nbsp;клиента]</span>. Здесь будет статья: текст с&nbsp;подзаголовками, при необходимости&nbsp;— фото и&nbsp;файлы для&nbsp;скачивания.</p>
+        </div>
+      </div>
+      <div class="svc-footer">
+        <p class="text-[14px] text-muted">Остались вопросы? <span class="font-semibold text-navy">Проконсультируем</span></p>
+        <button type="button" data-news-cta="Обучение по охране труда и ТБ" class="btn btn-primary w-full sm:w-auto">Получить консультацию <i data-lucide="arrow-right"></i></button>
+      </div>
+    </article>
+    <article data-news-panel="attestation" hidden>
+      <div class="aspect-[2.4/1] overflow-hidden bg-mist sm:aspect-[3.2/1]">
+        <img src="https://images.unsplash.com/photo-1549923746-9507eec27243?auto=format&fit=crop&w=1200&q=80" alt="" width="1200" height="500" loading="lazy" class="h-full w-full object-cover">
+      </div>
+      <div class="p-6 sm:p-9">
+        <p class="flex items-center gap-2.5"><span class="eyebrow">Полезные материалы</span><span class="text-line" aria-hidden="true">|</span><time class="text-[13px] text-muted">дд.мм.гггг</time></p>
+        <h2 id="news-title-attestation" class="mt-2 text-[22px] font-bold leading-tight text-navy sm:text-[28px]">Аттестация рабочих мест: этапы и&nbsp;документация</h2>
+        <p class="mt-3 text-[15.5px] leading-relaxed text-muted">Из&nbsp;каких этапов состоит аттестация рабочих мест и&nbsp;какие документы готовятся по&nbsp;её итогам.</p>
+
+        <div class="mt-7">
+          <h3 class="svc-h">Этапы аттестации</h3>
+          <ol class="mt-4 space-y-3 text-[15px] text-ink">
+              <li class="flex gap-3"><span class="svc-num">1</span>Выезд на&nbsp;объект заказчика</li>
+              <li class="flex gap-3"><span class="svc-num">2</span>Необходимые измерения на&nbsp;территории предприятия</li>
+              <li class="flex gap-3"><span class="svc-num">3</span>Подготовка отчётной документации</li>
+              <li class="flex gap-3"><span class="svc-num">4</span>Сопровождение документов в&nbsp;Министерстве занятости и&nbsp;сокращения бедности</li>
+            </ol>
+        </div>
+
+        <div class="news-draft mt-8">
+          <i data-lucide="file-pen-line" class="mt-0.5 h-5 w-5 shrink-0 text-accent"></i>
+          <p>Полный текст материала&nbsp;— <span class="font-semibold text-navy">[уточнить у&nbsp;клиента]</span>. Здесь будет статья: текст с&nbsp;подзаголовками, при необходимости&nbsp;— фото и&nbsp;файлы для&nbsp;скачивания.</p>
+        </div>
+      </div>
+      <div class="svc-footer">
+        <p class="text-[14px] text-muted">Остались вопросы? <span class="font-semibold text-navy">Проконсультируем</span></p>
+        <button type="button" data-news-cta="Аттестация рабочих мест" class="btn btn-primary w-full sm:w-auto">Получить консультацию <i data-lucide="arrow-right"></i></button>
       </div>
     </article>
   </dialog>

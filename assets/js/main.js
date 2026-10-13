@@ -357,30 +357,35 @@
     });
   }
 
-  // Попап «Подробнее об услуге»: открывается из карточек услуг и из hero
-  const svcModal = document.getElementById('service-modal');
-  if (svcModal && typeof svcModal.showModal === 'function') {
-    const svc = dialogController(svcModal);
-    const panels = [...svcModal.querySelectorAll('[data-service-panel]')];
-    const openService = (key) => {
-      panels.forEach((p) => { p.hidden = p.dataset.servicePanel !== key; });
-      svcModal.setAttribute('aria-labelledby', `svc-title-${key}`);
-      svc.open();
-      svcModal.scrollTop = 0;
-      svcModal.querySelector('[data-modal-close]').focus();
+  // Попапы с панелями: «Подробнее об услуге» (карточки услуг, hero) и «Новости и полезные материалы».
+  // Ссылка data-<name>-open="ключ" показывает панель data-<name>-panel="ключ";
+  // кнопка data-<name>-cta закрывает попап и открывает заявку (значение — услуга в форме).
+  const panelModal = (id, name, titlePrefix) => {
+    const dlg = document.getElementById(id);
+    if (!dlg || typeof dlg.showModal !== 'function') return;
+    const ctrl = dialogController(dlg);
+    const attr = (suffix) => `data-${name}-${suffix}`;
+    const panels = [...dlg.querySelectorAll(`[${attr('panel')}]`)];
+    const open = (key) => {
+      panels.forEach((p) => { p.hidden = p.getAttribute(attr('panel')) !== key; });
+      dlg.setAttribute('aria-labelledby', `${titlePrefix}-${key}`);
+      ctrl.open();
+      dlg.scrollTop = 0;
+      dlg.querySelector('[data-modal-close]').focus();
     };
-    document.querySelectorAll('[data-service-open]').forEach((link) => {
-      link.addEventListener('click', (e) => { e.preventDefault(); openService(link.dataset.serviceOpen); });
+    document.querySelectorAll(`[${attr('open')}]`).forEach((link) => {
+      link.addEventListener('click', (e) => { e.preventDefault(); open(link.getAttribute(attr('open'))); });
     });
-    // «Оставить заявку» в попапе услуги: закрываем его и открываем заявку с выбранной услугой
-    svcModal.querySelectorAll('[data-service-cta]').forEach((btn) => {
+    dlg.querySelectorAll(`[${attr('cta')}]`).forEach((btn) => {
       btn.addEventListener('click', async () => {
-        await svc.close();
-        if (openLeadModal) openLeadModal(btn.dataset.serviceCta);
+        await ctrl.close();
+        if (openLeadModal) openLeadModal(btn.getAttribute(attr('cta')));
         else document.getElementById('cta').scrollIntoView({ behavior: 'smooth' });
       });
     });
-  }
+  };
+  panelModal('service-modal', 'service', 'svc-title');
+  panelModal('news-modal', 'news', 'news-title');
 
   // Анимации появления (GSAP). Без JS/GSAP контент виден как есть.
   if (!window.gsap || !window.ScrollTrigger) return;
