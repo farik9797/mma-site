@@ -40,6 +40,80 @@
   updateNav();
   window.addEventListener('scroll', () => { if (!spyTick) { spyTick = true; requestAnimationFrame(updateNav); } }, { passive: true });
 
+  // Hero-слайдер: автосмена фона, пауза при наведении/фокусе и в скрытой вкладке, точки, свайп
+  const hero = document.getElementById('top');
+  const slides = hero ? [...hero.querySelectorAll('.hero-slide')] : [];
+  const dots = hero ? [...hero.querySelectorAll('.hero-dot')] : [];
+  if (slides.length > 1) {
+    const DURATION = 6500;
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    let current = 0;
+    let timer = null;
+    let startedAt = 0;
+    let remaining = DURATION;
+    let hovered = false;
+    let focused = false;
+
+    const isBlocked = () => reduceMotion.matches || document.hidden || hovered || focused;
+    const schedule = (ms) => {
+      clearTimeout(timer);
+      if (isBlocked()) return;
+      startedAt = performance.now();
+      remaining = ms;
+      timer = setTimeout(() => goTo(current + 1), ms);
+    };
+    const restartBar = (dot) => {
+      const bar = dot.querySelector('.hero-dot-bar');
+      bar.style.animation = 'none';
+      void bar.offsetWidth;
+      bar.style.animation = '';
+    };
+    const goTo = (n) => {
+      current = (n + slides.length) % slides.length;
+      slides.forEach((s, i) => {
+        s.classList.toggle('is-active', i === current);
+        s.setAttribute('aria-hidden', String(i !== current));
+      });
+      dots.forEach((d, i) => {
+        d.classList.toggle('is-active', i === current);
+        d.setAttribute('aria-current', String(i === current));
+      });
+      restartBar(dots[current]);
+      schedule(DURATION);
+    };
+    const pause = () => {
+      if (timer) remaining = Math.max(0, remaining - (performance.now() - startedAt));
+      clearTimeout(timer);
+      timer = null;
+      hero.classList.add('is-paused');
+    };
+    const resume = () => {
+      if (isBlocked()) return;
+      hero.classList.remove('is-paused');
+      schedule(remaining || DURATION);
+    };
+
+    dots.forEach((d, i) => d.addEventListener('click', () => goTo(i)));
+    // Пауза только от мыши: на телефоне касание не должно останавливать автопрокрутку
+    hero.addEventListener('pointerenter', (e) => { if (e.pointerType === 'mouse') { hovered = true; pause(); } });
+    hero.addEventListener('pointerleave', (e) => { if (e.pointerType === 'mouse') { hovered = false; resume(); } });
+    hero.addEventListener('focusin', () => { focused = true; pause(); });
+    hero.addEventListener('focusout', (e) => { if (!hero.contains(e.relatedTarget)) { focused = false; resume(); } });
+    document.addEventListener('visibilitychange', () => (document.hidden ? pause() : resume()));
+
+    // Свайп на сенсорных экранах
+    let touchX = null;
+    hero.addEventListener('touchstart', (e) => { touchX = e.touches[0].clientX; }, { passive: true });
+    hero.addEventListener('touchend', (e) => {
+      if (touchX === null) return;
+      const dx = e.changedTouches[0].clientX - touchX;
+      if (Math.abs(dx) > 50) goTo(current + (dx < 0 ? 1 : -1));
+      touchX = null;
+    }, { passive: true });
+
+    schedule(DURATION);
+  }
+
   // Кнопка «Получить консультацию»: на мобильном раскрывает форму, на десктопе — фокус на первое поле
   const ctaOpen = document.getElementById('cta-open');
   const ctaForm = document.getElementById('cta-form');
@@ -231,7 +305,7 @@
   gsap.registerPlugin(ScrollTrigger);
   gsap.matchMedia().add('(prefers-reduced-motion: no-preference)', () => {
     gsap.from('.hero-anim', { y: 24, opacity: 0, duration: 0.8, ease: 'power3.out', stagger: 0.08 });
-    gsap.from('.hero-img', { scale: 1.05, opacity: 0, duration: 1.4, ease: 'power2.out' });
+    gsap.from('.hero-slides', { opacity: 0, duration: 1.2, ease: 'power2.out' });
 
     gsap.set('[data-reveal]', { y: 28, opacity: 0 });
     ScrollTrigger.batch('[data-reveal]', {

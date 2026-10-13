@@ -89,13 +89,29 @@
       .why-shade { background: linear-gradient(90deg, #102B46 0%, #102B46 54%, rgba(16,43,70,0.7) 64%, rgba(16,43,70,0.35) 80%, rgba(16,43,70,0.2) 100%); }
       .cta-shade { background: linear-gradient(90deg, #0C2238 0%, #0C2238 22%, rgba(12,34,56,0.55) 36%, rgba(12,34,56,0.55) 52%, #0C2238 64%); }
       @media (min-width: 1024px) {
-        .hero-shade { background: linear-gradient(90deg, rgba(16,43,70,0.92) 0%, rgba(16,43,70,0.8) 30%, rgba(16,43,70,0.45) 48%, rgba(16,43,70,0) 64%); }
+        .hero-shade { background: linear-gradient(90deg, rgba(16,43,70,0.94) 0%, rgba(16,43,70,0.86) 34%, rgba(16,43,70,0.55) 52%, rgba(16,43,70,0.1) 70%, rgba(16,43,70,0) 78%); }
       }
 
       .news-track { scrollbar-width: none; }
       .news-track::-webkit-scrollbar { display: none; }
 
       #site-header.is-scrolled { @apply border-line shadow-[0_10px_30px_-20px_rgba(16,43,70,0.35)]; }
+
+      /* Hero-слайдер: смена фона через прозрачность + медленное приближение кадра */
+      .hero { --slide-dur: 6500ms; }
+      .hero-slide { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transform: scale(1.12); transition: opacity 1.4s ease-in-out, transform 9s cubic-bezier(0.25, 0.1, 0.25, 1); will-change: opacity, transform; }
+      .hero-slide.is-active { opacity: 1; transform: scale(1); }
+      .hero-dot { @apply relative h-1.5 w-8 cursor-pointer overflow-hidden rounded-full bg-white/30 transition-all duration-300 hover:bg-white/50; }
+      .hero-dot::before { content: ''; @apply absolute -inset-y-3 inset-x-0; } /* увеличенная зона нажатия */
+      .hero-dot.is-active { @apply w-14; }
+      .hero-dot-bar { @apply absolute inset-0 origin-left scale-x-0 rounded-full bg-white; }
+      .hero-dot.is-active .hero-dot-bar { animation: hero-progress var(--slide-dur) linear forwards; }
+      .hero.is-paused .hero-dot.is-active .hero-dot-bar { animation-play-state: paused; }
+      @keyframes hero-progress { to { transform: scaleX(1); } }
+      @media (prefers-reduced-motion: reduce) {
+        .hero-slide { transition: none; transform: none; }
+        .hero-dot.is-active .hero-dot-bar { animation: none; transform: scaleX(1); }
+      }
 
       /* Попап заявки: нативный <dialog>; на мобильном — нижняя шторка */
       .modal {
@@ -178,14 +194,31 @@
 
   <main id="main">
     <!-- ============ 2. HERO ============ -->
-    <section id="top" class="relative isolate overflow-hidden bg-navy text-white">
-      <img
-        src="assets/img/hero.jpg"
-        srcset="assets/img/hero-1000.jpg 1000w, assets/img/hero.jpg 2000w"
-        sizes="100vw"
-        alt="Специалисты по охране труда в защитных касках и сигнальных жилетах на промышленном объекте"
-        width="2000" height="989" fetchpriority="high"
-        class="hero-img absolute inset-0 -z-20 h-full w-full object-cover object-[80%_center] lg:object-right">
+    <section id="top" class="hero relative isolate overflow-hidden bg-navy text-white" aria-roledescription="слайдер" aria-label="Фото направлений работы">
+      <!-- Слайдер фона: смена кадров плавная, текст hero не меняется -->
+      <div class="hero-slides absolute inset-0 -z-20">
+        <img
+          src="assets/img/hero-blueprint.jpg"
+          srcset="assets/img/hero-blueprint-1000.jpg 1000w, assets/img/hero-blueprint.jpg 2000w"
+          sizes="100vw"
+          alt="Инженеры по охране труда в касках обсуждают план цеха на производстве"
+          width="2000" height="848" fetchpriority="high"
+          class="hero-slide is-active object-[78%_center] lg:object-right">
+        <img
+          src="assets/img/hero-tablet.jpg"
+          srcset="assets/img/hero-tablet-1000.jpg 1000w, assets/img/hero-tablet.jpg 2000w"
+          sizes="100vw"
+          alt="Специалист с планшетом проводит инструктаж сотрудника в цехе"
+          width="2000" height="848" fetchpriority="low" decoding="async" aria-hidden="true"
+          class="hero-slide object-[72%_center] lg:object-right">
+        <img
+          src="assets/img/hero.jpg"
+          srcset="assets/img/hero-1000.jpg 1000w, assets/img/hero.jpg 2000w"
+          sizes="100vw"
+          alt="Специалисты по охране труда в защитных касках и сигнальных жилетах на промышленном объекте"
+          width="2000" height="989" fetchpriority="low" decoding="async" aria-hidden="true"
+          class="hero-slide object-[80%_center] lg:object-right">
+      </div>
       <div class="hero-shade absolute inset-0 -z-10" aria-hidden="true"></div>
 
       <div class="container-x flex min-h-[600px] flex-col justify-between pb-8 pt-10 sm:min-h-[640px] lg:min-h-[700px] lg:pb-14 lg:pt-24">
@@ -205,7 +238,8 @@
           </div>
         </div>
 
-        <dl class="hero-anim mt-12 grid grid-cols-2 gap-4 sm:max-w-[600px] sm:gap-10">
+        <div class="hero-anim mt-12 flex flex-col gap-7 lg:flex-row lg:items-end lg:justify-between">
+        <dl class="grid grid-cols-2 gap-4 sm:max-w-[600px] sm:gap-10">
           <div class="flex items-center gap-3">
             <span class="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-white/35 sm:h-12 sm:w-12"><i data-lucide="shield-check" class="h-5 w-5"></i></span>
             <div>
@@ -220,6 +254,12 @@
             </div>
           </div>
         </dl>
+          <div class="hero-dots flex items-center gap-2.5" role="group" aria-label="Переключение слайдов">
+            <button type="button" class="hero-dot is-active" aria-label="Слайд 1 из 3" aria-current="true"><span class="hero-dot-bar"></span></button>
+            <button type="button" class="hero-dot" aria-label="Слайд 2 из 3" aria-current="false"><span class="hero-dot-bar"></span></button>
+            <button type="button" class="hero-dot" aria-label="Слайд 3 из 3" aria-current="false"><span class="hero-dot-bar"></span></button>
+          </div>
+        </div>
       </div>
     </section>
 
