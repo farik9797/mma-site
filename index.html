@@ -113,12 +113,17 @@
       .hero-text { @apply mt-5 max-w-[500px] text-[15px] leading-relaxed text-white/80 sm:text-[17px]; }
       .hero-actions { @apply mt-8 flex flex-col items-start gap-3.5 sm:flex-row sm:items-center sm:gap-4; }
 
-      .hero-card { @apply hidden rounded-3xl border border-white/20 p-6 lg:block; background: rgba(16, 43, 70, 0.5); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12); }
+      .hero-card { @apply hidden rounded-3xl border border-white/20 p-6 lg:block lg:self-end; background: rgba(16, 43, 70, 0.5); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12); }
       .hero-card-eyebrow { @apply text-[12px] font-bold uppercase tracking-[0.12em] text-white/70; }
       .hero-card-link { @apply mt-6 inline-flex items-center gap-2 text-[14.5px] font-semibold text-accent-300 transition-colors hover:text-white; }
       .hero-card-link svg { @apply h-4 w-4; }
 
-      .hero-status { display: flex; justify-content: center; gap: 0.5rem; margin-top: 1.5rem; }
+      .hero-status { display: flex; align-self: flex-start; gap: 0.5rem; margin-top: 1.5rem; }
+      /* Десктоп: текст по центру высоты, карточка прижата вниз — в одну линию с полосами слева */
+      @media (min-width: 1024px) {
+        .hero-pane { align-self: stretch; }
+        .hero-status { position: relative; z-index: 1; margin-top: -24px; }
+      }
       /* Кнопка выше полосы — удобная зона нажатия; видимая дорожка и заливка внутри */
       .hero-status__bar { position: relative; width: 48px; height: 24px; padding: 0; border: 0; background: transparent; cursor: pointer; }
       @media (min-width: 768px) { .hero-status__bar { width: 62px; } }
@@ -252,11 +257,11 @@
       <div class="hero-shade absolute inset-0 -z-10" aria-hidden="true"></div>
 
       <div class="hero-inner container-x flex flex-col pb-8 pt-10 lg:pb-10 lg:pt-12">
-        <div class="hero-panes hero-anim my-auto">
+        <div class="hero-panes hero-anim grow">
           <!-- Слайд 1: все направления -->
           <div class="hero-pane is-active" id="hero-pane-0" role="group" aria-roledescription="слайд" aria-label="1 из 3: Все направления" aria-hidden="false">
-            <div class="grid items-end gap-8 lg:grid-cols-[1.5fr_.5fr] lg:gap-12">
-              <div>
+            <div class="grid gap-8 lg:h-full lg:grid-cols-[1.5fr_.5fr] lg:gap-12">
+              <div class="lg:self-center lg:py-12">
                 <h1 class="hero-title">Охрана труда <br>и&nbsp;техника безопасности <br>для&nbsp;вашего предприятия</h1>
                 <p class="hero-text">Профессиональное обучение и аттестация рабочих мест. Помогаем организациям Узбекистана обеспечивать безопасность сотрудников и&nbsp;соблюдать установленные требования.</p>
                 <div class="hero-actions">
@@ -286,8 +291,8 @@
 
           <!-- Слайд 2: обучение -->
           <div class="hero-pane" id="hero-pane-1" role="group" aria-roledescription="слайд" aria-label="2 из 3: Обучение по охране труда и технике безопасности" aria-hidden="true">
-            <div class="grid items-end gap-8 lg:grid-cols-[1.5fr_.5fr] lg:gap-12">
-              <div>
+            <div class="grid gap-8 lg:h-full lg:grid-cols-[1.5fr_.5fr] lg:gap-12">
+              <div class="lg:self-center lg:py-12">
                 <h2 class="hero-title">Обучение по охране труда <br>и&nbsp;технике безопасности</h2>
                 <p class="hero-text">Организуем обучение сотрудников вашего предприятия: формируем учебные группы, проводим экзамен и&nbsp;оформляем документы по&nbsp;итогам.</p>
                 <div class="hero-actions">
@@ -309,8 +314,8 @@
 
           <!-- Слайд 3: аттестация -->
           <div class="hero-pane" id="hero-pane-2" role="group" aria-roledescription="слайд" aria-label="3 из 3: Аттестация рабочих мест" aria-hidden="true">
-            <div class="grid items-end gap-8 lg:grid-cols-[1.5fr_.5fr] lg:gap-12">
-              <div>
+            <div class="grid gap-8 lg:h-full lg:grid-cols-[1.5fr_.5fr] lg:gap-12">
+              <div class="lg:self-center lg:py-12">
                 <h2 class="hero-title">Аттестация <br>рабочих мест</h2>
                 <p class="hero-text">Выезжаем на&nbsp;объект заказчика, проводим необходимые замеры, готовим отчёт и&nbsp;сопровождаем документацию.</p>
                 <div class="hero-actions">
