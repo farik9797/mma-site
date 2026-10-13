@@ -55,13 +55,53 @@
     });
   }
 
+  // Маска телефона Узбекистана: +998 (90) 123-45-67 — для всех полей type="tel"
+  const PHONE_CODE = '+998';
+  // Местная часть номера (9 цифр) без кода страны
+  const phoneDigits = (value) => {
+    let d = value.replace(/\D/g, '');
+    const hasCode = value.trim().startsWith('+') || d.length > 9;
+    if (hasCode && d.startsWith('998')) d = d.slice(3);
+    else if (hasCode && '998'.startsWith(d)) d = ''; // стёрли часть кода — считаем поле пустым
+    return d.slice(0, 9);
+  };
+  const formatPhone = (d) => {
+    if (!d) return PHONE_CODE + ' ';
+    let out = PHONE_CODE + ' (' + d.slice(0, 2);
+    if (d.length >= 2) out += ')';
+    if (d.length > 2) out += ' ' + d.slice(2, 5);
+    if (d.length > 5) out += '-' + d.slice(5, 7);
+    if (d.length > 7) out += '-' + d.slice(7, 9);
+    return out;
+  };
+  const isPhoneComplete = (value) => phoneDigits(value).length === 9;
+
+  document.querySelectorAll('input[type="tel"]').forEach((input) => {
+    const caretToEnd = () => { const n = input.value.length; input.setSelectionRange(n, n); };
+    input.addEventListener('focus', () => {
+      if (!input.value) { input.value = formatPhone(''); input.dataset.digits = ''; }
+      requestAnimationFrame(caretToEnd);
+    });
+    input.addEventListener('input', (e) => {
+      let d = phoneDigits(input.value);
+      // Стёрли скобку/дефис — цифр столько же, поэтому убираем последнюю цифру
+      if (e.inputType && e.inputType.startsWith('delete') && d === (input.dataset.digits || '')) d = d.slice(0, -1);
+      input.dataset.digits = d;
+      input.value = formatPhone(d);
+      caretToEnd();
+    });
+    input.addEventListener('blur', () => {
+      if (!phoneDigits(input.value)) { input.value = ''; input.dataset.digits = ''; }
+    });
+  });
+
   // Формы: проверка обязательных полей.
   // Макет: отправка не подключена — на WordPress подключить обработчик (CF7 / admin-ajax).
   document.querySelectorAll('.js-form').forEach((form) => {
     const status = form.querySelector('.form-status');
     const isValid = (f) => {
       if (f.type === 'checkbox') return f.checked;
-      if (f.type === 'tel') return f.value.replace(/\D/g, '').length >= 9;
+      if (f.type === 'tel') return isPhoneComplete(f.value);
       return f.value.trim() !== '';
     };
 
@@ -147,7 +187,7 @@
 
     const rules = {
       name: (f) => f.value.trim() !== '',
-      phone: (f) => f.value.replace(/\D/g, '').length >= 9,
+      phone: (f) => isPhoneComplete(f.value),
       consent: (f) => f.checked,
     };
     const setFieldState = (f, ok) => {
