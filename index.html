@@ -106,7 +106,7 @@
       .hero-slide.is-active { opacity: 1; transform: scale(1); }
 
       .hero-panes { display: grid; overflow: hidden; }
-      .hero-pane { grid-area: 1 / 1; align-self: end; opacity: 0; transform: translateX(100%); transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s ease; }
+      .hero-pane { grid-area: 1 / 1; align-self: center; opacity: 0; transform: translateX(100%); transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s ease; }
       .hero-pane.is-active { opacity: 1; transform: none; }
       .hero-pane:not(.is-active) { pointer-events: none; }
       .hero-title { @apply text-[27px] font-bold leading-[1.18] tracking-[-0.01em] sm:text-[42px] lg:text-[50px] lg:leading-[1.12]; }
@@ -157,6 +157,14 @@
       @media (prefers-reduced-motion: reduce) {
         .modal, .modal::backdrop { transition: none; }
       }
+      /* Попап услуги: шире попапа заявки; на мобильном — та же нижняя шторка */
+      @media (min-width: 640px) { .modal-wide { max-width: 820px; } }
+      .svc-h { @apply text-[13px] font-bold uppercase tracking-[0.08em] text-navy; }
+      .svc-num { @apply grid h-6 w-6 shrink-0 place-items-center rounded-full bg-accent/10 text-[12.5px] font-semibold text-accent; }
+      .svc-facts { @apply grid grid-cols-3 divide-x divide-line rounded-xl bg-mist py-4 text-center; }
+      .svc-facts dt { @apply text-[20px] font-bold leading-none text-navy sm:text-[22px]; }
+      .svc-facts dd { @apply mt-1.5 px-2 text-[12.5px] leading-snug text-muted sm:text-[13px]; }
+      .svc-footer { @apply sticky bottom-0 z-10 flex flex-col gap-3 border-t border-line bg-white px-6 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-9; }
       .field-error { @apply mt-1.5 text-[13px] text-[#B42318]; }
       .btn:active { @apply scale-[0.98]; }
     }
@@ -243,8 +251,8 @@
       </div>
       <div class="hero-shade absolute inset-0 -z-10" aria-hidden="true"></div>
 
-      <div class="hero-inner container-x flex flex-col justify-end pb-8 pt-10 lg:pb-10 lg:pt-16">
-        <div class="hero-panes hero-anim">
+      <div class="hero-inner container-x flex flex-col pb-8 pt-10 lg:pb-10 lg:pt-12">
+        <div class="hero-panes hero-anim my-auto">
           <!-- Слайд 1: все направления -->
           <div class="hero-pane is-active" id="hero-pane-0" role="group" aria-roledescription="слайд" aria-label="1 из 3: Все направления" aria-hidden="false">
             <div class="grid items-end gap-8 lg:grid-cols-[1.5fr_.5fr] lg:gap-12">
@@ -284,7 +292,7 @@
                 <p class="hero-text">Организуем обучение сотрудников вашего предприятия: формируем учебные группы, проводим экзамен и&nbsp;оформляем документы по&nbsp;итогам.</p>
                 <div class="hero-actions">
                   <a href="#cta" data-modal-open class="btn btn-primary">Записать сотрудников <i data-lucide="arrow-right"></i></a>
-                  <a href="#services" class="btn btn-outline-light">Подробнее об обучении <i data-lucide="arrow-right"></i></a>
+                  <a href="#services" data-service-open="training" aria-haspopup="dialog" class="btn btn-outline-light">Подробнее об обучении <i data-lucide="arrow-right"></i></a>
                 </div>
               </div>
               <aside class="hero-card" aria-label="Как проходит обучение">
@@ -294,7 +302,7 @@
                   <li class="flex gap-3"><i data-lucide="clipboard-check" class="mt-0.5 h-5 w-5 shrink-0 text-accent-300"></i>Проведение экзамена</li>
                   <li class="flex gap-3"><i data-lucide="file-check" class="mt-0.5 h-5 w-5 shrink-0 text-accent-300"></i>Оформление документов по&nbsp;итогам</li>
                 </ul>
-                <a href="#services" class="hero-card-link">Об услуге <i data-lucide="arrow-right"></i></a>
+                <a href="#services" data-service-open="training" aria-haspopup="dialog" class="hero-card-link">Об услуге <i data-lucide="arrow-right"></i></a>
               </aside>
             </div>
           </div>
@@ -307,7 +315,7 @@
                 <p class="hero-text">Выезжаем на&nbsp;объект заказчика, проводим необходимые замеры, готовим отчёт и&nbsp;сопровождаем документацию.</p>
                 <div class="hero-actions">
                   <a href="#cta" data-modal-open class="btn btn-primary">Заказать аттестацию <i data-lucide="arrow-right"></i></a>
-                  <a href="#services" class="btn btn-outline-light">Подробнее об аттестации <i data-lucide="arrow-right"></i></a>
+                  <a href="#services" data-service-open="attestation" aria-haspopup="dialog" class="btn btn-outline-light">Подробнее об аттестации <i data-lucide="arrow-right"></i></a>
                 </div>
               </div>
               <aside class="hero-card" aria-label="Что входит в аттестацию">
@@ -317,7 +325,7 @@
                   <li class="flex gap-3"><i data-lucide="ruler" class="mt-0.5 h-5 w-5 shrink-0 text-accent-300"></i>Необходимые замеры</li>
                   <li class="flex gap-3"><i data-lucide="file-check" class="mt-0.5 h-5 w-5 shrink-0 text-accent-300"></i>Отчёт и&nbsp;сопровождение документов</li>
                 </ul>
-                <a href="#services" class="hero-card-link">Об услуге <i data-lucide="arrow-right"></i></a>
+                <a href="#services" data-service-open="attestation" aria-haspopup="dialog" class="hero-card-link">Об услуге <i data-lucide="arrow-right"></i></a>
               </aside>
             </div>
           </div>
@@ -390,7 +398,7 @@
                 <li class="flex items-center gap-2.5"><i data-lucide="circle-check" class="h-[18px] w-[18px] shrink-0 text-accent"></i>Современные методики</li>
                 <li class="flex items-center gap-2.5"><i data-lucide="circle-check" class="h-[18px] w-[18px] shrink-0 text-accent"></i>Официальные документы</li>
               </ul>
-              <a href="#" class="link-arrow mt-4 self-start sm:mt-7">Подробнее <i data-lucide="arrow-right"></i></a>
+              <a href="#services" data-service-open="training" class="link-arrow mt-4 self-start sm:mt-7" aria-haspopup="dialog">Подробнее <i data-lucide="arrow-right"></i></a>
             </div>
           </article>
 
@@ -407,7 +415,7 @@
                 <li class="flex items-center gap-2.5"><i data-lucide="circle-check" class="h-[18px] w-[18px] shrink-0 text-accent"></i>Точный и объективный результат</li>
                 <li class="flex items-center gap-2.5"><i data-lucide="circle-check" class="h-[18px] w-[18px] shrink-0 text-accent"></i>Сопровождение в&nbsp;Министерстве занятости</li>
               </ul>
-              <a href="#" class="link-arrow mt-4 self-start sm:mt-7">Подробнее <i data-lucide="arrow-right"></i></a>
+              <a href="#services" data-service-open="attestation" class="link-arrow mt-4 self-start sm:mt-7" aria-haspopup="dialog">Подробнее <i data-lucide="arrow-right"></i></a>
             </div>
           </article>
         </div>
@@ -783,6 +791,102 @@
         <button type="button" data-modal-close class="btn mt-6 border border-line px-10 text-navy hover:border-accent hover:text-accent">Закрыть</button>
       </div>
     </div>
+  </dialog>
+
+  <!-- ============ ПОПАП «ПОДРОБНЕЕ ОБ УСЛУГЕ» ============ -->
+  <!-- Тексты — только из брифа. Стоимость и сроки клиент не давал: «по запросу». -->
+  <dialog id="service-modal" class="modal modal-wide" aria-labelledby="svc-title-training">
+    <div class="sticky top-0 z-20 flex h-0 justify-end">
+      <button type="button" data-modal-close class="mr-3 mt-3 grid h-10 w-10 shrink-0 cursor-pointer place-items-center rounded-full bg-white/90 text-navy shadow-[0_6px_18px_-8px_rgba(16,43,70,0.5)] transition-colors hover:bg-white" aria-label="Закрыть">
+        <i data-lucide="x" class="h-5 w-5"></i>
+      </button>
+    </div>
+
+    <!-- Обучение по охране труда и ТБ -->
+    <article data-service-panel="training">
+      <div class="aspect-[2.4/1] overflow-hidden bg-mist sm:aspect-[3.2/1]">
+        <img src="assets/img/training.jpg" alt="" width="1200" height="669" loading="lazy" class="h-full w-full object-cover object-[center_40%]">
+      </div>
+      <div class="p-6 sm:p-9">
+        <p class="eyebrow">Услуга</p>
+        <h2 id="svc-title-training" class="mt-2 text-[22px] font-bold leading-tight text-navy sm:text-[28px]">Обучение по охране труда и&nbsp;технике безопасности</h2>
+        <p class="mt-3 text-[15.5px] leading-relaxed text-muted">Организуем обучение сотрудников вашего предприятия: формируем учебные группы, проводим экзамен и&nbsp;оформляем документы по&nbsp;итогам.</p>
+
+        <div class="mt-7 grid gap-8 sm:grid-cols-2 sm:gap-10">
+          <div>
+            <h3 class="svc-h">Что входит</h3>
+            <ul class="mt-4 space-y-3 text-[15px] text-ink">
+              <li class="flex gap-3"><i data-lucide="circle-check" class="mt-0.5 h-[18px] w-[18px] shrink-0 text-accent"></i>Организация обучения сотрудников</li>
+              <li class="flex gap-3"><i data-lucide="circle-check" class="mt-0.5 h-[18px] w-[18px] shrink-0 text-accent"></i>Формирование учебных групп</li>
+              <li class="flex gap-3"><i data-lucide="circle-check" class="mt-0.5 h-[18px] w-[18px] shrink-0 text-accent"></i>Проведение экзамена</li>
+              <li class="flex gap-3"><i data-lucide="circle-check" class="mt-0.5 h-[18px] w-[18px] shrink-0 text-accent"></i>Оформление документов по&nbsp;итогам обучения</li>
+            </ul>
+          </div>
+          <div>
+            <h3 class="svc-h">Как проходит</h3>
+            <ol class="mt-4 space-y-3 text-[15px] text-ink">
+              <li class="flex gap-3"><span class="svc-num">1</span>Заявка и консультация</li>
+              <li class="flex gap-3"><span class="svc-num">2</span>Согласование условий и&nbsp;договор</li>
+              <li class="flex gap-3"><span class="svc-num">3</span>Обучение сотрудников и&nbsp;экзамен</li>
+              <li class="flex gap-3"><span class="svc-num">4</span>Оформление и&nbsp;передача документов</li>
+            </ol>
+          </div>
+        </div>
+
+        <dl class="svc-facts mt-8">
+          <div><dt>8</dt><dd>сотрудников в&nbsp;команде</dd></div>
+          <div><dt>2</dt><dd>кандидата медицинских наук</dd></div>
+          <div><dt>4</dt><dd>специалиста с&nbsp;сертификатами</dd></div>
+        </dl>
+      </div>
+      <div class="svc-footer">
+        <p class="text-[14px] text-muted">Стоимость и сроки&nbsp;— <span class="font-semibold text-navy">по запросу</span></p>
+        <button type="button" data-service-cta="Обучение по охране труда и ТБ" class="btn btn-primary w-full sm:w-auto">Оставить заявку <i data-lucide="arrow-right"></i></button>
+      </div>
+    </article>
+
+    <!-- Аттестация рабочих мест -->
+    <article data-service-panel="attestation" hidden>
+      <div class="aspect-[2.4/1] overflow-hidden bg-mist sm:aspect-[3.2/1]">
+        <img src="assets/img/attestation.jpg" alt="" width="1200" height="545" loading="lazy" class="h-full w-full object-cover">
+      </div>
+      <div class="p-6 sm:p-9">
+        <p class="eyebrow">Услуга</p>
+        <h2 id="svc-title-attestation" class="mt-2 text-[22px] font-bold leading-tight text-navy sm:text-[28px]">Аттестация рабочих мест</h2>
+        <p class="mt-3 text-[15.5px] leading-relaxed text-muted">Выезжаем на&nbsp;объект заказчика, проводим необходимые замеры, готовим отчёт и&nbsp;сопровождаем документацию.</p>
+
+        <div class="mt-7 grid gap-8 sm:grid-cols-2 sm:gap-10">
+          <div>
+            <h3 class="svc-h">Что входит</h3>
+            <ul class="mt-4 space-y-3 text-[15px] text-ink">
+              <li class="flex gap-3"><i data-lucide="circle-check" class="mt-0.5 h-[18px] w-[18px] shrink-0 text-accent"></i>Выезд на&nbsp;объект заказчика</li>
+              <li class="flex gap-3"><i data-lucide="circle-check" class="mt-0.5 h-[18px] w-[18px] shrink-0 text-accent"></i>Необходимые измерения на&nbsp;территории предприятия</li>
+              <li class="flex gap-3"><i data-lucide="circle-check" class="mt-0.5 h-[18px] w-[18px] shrink-0 text-accent"></i>Подготовка отчётной документации</li>
+              <li class="flex gap-3"><i data-lucide="circle-check" class="mt-0.5 h-[18px] w-[18px] shrink-0 text-accent"></i>Сопровождение документов в&nbsp;Министерстве занятости и&nbsp;сокращения бедности</li>
+            </ul>
+          </div>
+          <div>
+            <h3 class="svc-h">Как проходит</h3>
+            <ol class="mt-4 space-y-3 text-[15px] text-ink">
+              <li class="flex gap-3"><span class="svc-num">1</span>Заявка и консультация</li>
+              <li class="flex gap-3"><span class="svc-num">2</span>Согласование условий и&nbsp;договор</li>
+              <li class="flex gap-3"><span class="svc-num">3</span>Выезд и&nbsp;замеры на&nbsp;объекте</li>
+              <li class="flex gap-3"><span class="svc-num">4</span>Отчёт и&nbsp;сопровождение документов</li>
+            </ol>
+          </div>
+        </div>
+
+        <dl class="svc-facts mt-8">
+          <div><dt>с 2010</dt><dd>года в&nbsp;сфере охраны труда</dd></div>
+          <div><dt>8</dt><dd>сотрудников в&nbsp;команде</dd></div>
+          <div><dt>4</dt><dd>специалиста с&nbsp;сертификатами</dd></div>
+        </dl>
+      </div>
+      <div class="svc-footer">
+        <p class="text-[14px] text-muted">Стоимость и сроки&nbsp;— <span class="font-semibold text-navy">по запросу</span></p>
+        <button type="button" data-service-cta="Аттестация рабочих мест" class="btn btn-primary w-full sm:w-auto">Оставить заявку <i data-lucide="arrow-right"></i></button>
+      </div>
+    </article>
   </dialog>
 
   <script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>

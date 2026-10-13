@@ -255,54 +255,65 @@
     });
   });
 
+  // Общая обвязка попапов на <dialog>: анимация, блокировка прокрутки, закрытие по Esc / фону / крестику
+  const reduceMotionMQ = window.matchMedia('(prefers-reduced-motion: reduce)');
+  // Прокрутку страницы возвращаем, только если не осталось других открытых попапов
+  // (при переходе «услуга → заявка» событие close первого приходит уже после открытия второго)
+  const unlockScroll = (except) => {
+    const othersOpen = [...document.querySelectorAll('dialog[open]')].some((d) => d !== except);
+    if (!othersOpen) document.documentElement.classList.remove('overflow-hidden');
+  };
+  const dialogController = (dlg) => {
+    let closeTimer = null;
+    const open = () => {
+      clearTimeout(closeTimer);
+      if (!dlg.open) dlg.showModal();
+      document.documentElement.classList.add('overflow-hidden');
+      void dlg.offsetWidth; // фиксируем стартовое состояние, чтобы сработал transition
+      dlg.classList.add('is-visible');
+    };
+    const close = () => new Promise((resolve) => {
+      dlg.classList.remove('is-visible');
+      unlockScroll(dlg);
+      clearTimeout(closeTimer);
+      closeTimer = setTimeout(() => { if (dlg.open) dlg.close(); resolve(); }, reduceMotionMQ.matches ? 0 : 260);
+    });
+    dlg.querySelectorAll('[data-modal-close]').forEach((btn) => btn.addEventListener('click', () => close()));
+    dlg.addEventListener('click', (e) => { if (e.target === dlg) close(); }); // клик по затемнению
+    dlg.addEventListener('cancel', (e) => { e.preventDefault(); close(); }); // Esc — с анимацией
+    dlg.addEventListener('close', () => {
+      unlockScroll(dlg);
+      dlg.classList.remove('is-visible');
+    });
+    return { open, close };
+  };
+  let openLeadModal = null; // попап услуги открывает заявку с уже выбранной услугой
+
   // Попап «Оставить заявку» (нативный <dialog>). Без JS кнопки ведут к форме в блоке #cta.
   const modal = document.getElementById('lead-modal');
   if (modal && typeof modal.showModal === 'function') {
-    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const lead = dialogController(modal);
     const modalForm = modal.querySelector('.js-modal-form');
     const views = {
       form: modal.querySelector('[data-modal-view="form"]'),
       success: modal.querySelector('[data-modal-view="success"]'),
     };
     const submitBtn = modalForm.querySelector('[type="submit"]');
-    let closeTimer = null;
 
     const showView = (name) => {
       views.form.classList.toggle('hidden', name !== 'form');
       views.success.classList.toggle('hidden', name !== 'success');
     };
 
-    const openModal = () => {
-      clearTimeout(closeTimer);
+    openLeadModal = (service) => {
       showView('form');
-      if (!modal.open) modal.showModal();
-      document.documentElement.classList.add('overflow-hidden');
-      void modal.offsetWidth; // фиксируем стартовое состояние, чтобы сработал transition
-      modal.classList.add('is-visible');
+      lead.open();
+      modalForm.elements.service.value = service || ''; // услуга из попапа «Подробнее» или пусто
       modalForm.querySelector('input').focus();
     };
 
-    const finishClose = () => {
-      if (modal.open) modal.close();
-    };
-
-    const closeModal = () => {
-      modal.classList.remove('is-visible');
-      document.documentElement.classList.remove('overflow-hidden');
-      closeTimer = setTimeout(finishClose, reduceMotion.matches ? 0 : 260);
-    };
-
     document.querySelectorAll('[data-modal-open]').forEach((btn) => {
-      btn.addEventListener('click', (e) => { e.preventDefault(); openModal(); });
-    });
-    modal.querySelectorAll('[data-modal-close]').forEach((btn) => btn.addEventListener('click', closeModal));
-    // Клик по затемнению (вне панели) закрывает попап
-    modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
-    // Esc: перехватываем, чтобы закрыть с анимацией
-    modal.addEventListener('cancel', (e) => { e.preventDefault(); closeModal(); });
-    modal.addEventListener('close', () => {
-      document.documentElement.classList.remove('overflow-hidden');
-      modal.classList.remove('is-visible');
+      btn.addEventListener('click', (e) => { e.preventDefault(); openLeadModal(btn.dataset.service); });
     });
 
     const rules = {
@@ -343,6 +354,31 @@
     modalForm.addEventListener('input', (e) => {
       const f = e.target;
       if (f.classList.contains('is-invalid') && rules[f.name] && rules[f.name](f)) setFieldState(f, true);
+    });
+  }
+
+  // Попап «Подробнее об услуге»: открывается из карточек услуг и из hero
+  const svcModal = document.getElementById('service-modal');
+  if (svcModal && typeof svcModal.showModal === 'function') {
+    const svc = dialogController(svcModal);
+    const panels = [...svcModal.querySelectorAll('[data-service-panel]')];
+    const openService = (key) => {
+      panels.forEach((p) => { p.hidden = p.dataset.servicePanel !== key; });
+      svcModal.setAttribute('aria-labelledby', `svc-title-${key}`);
+      svc.open();
+      svcModal.scrollTop = 0;
+      svcModal.querySelector('[data-modal-close]').focus();
+    };
+    document.querySelectorAll('[data-service-open]').forEach((link) => {
+      link.addEventListener('click', (e) => { e.preventDefault(); openService(link.dataset.serviceOpen); });
+    });
+    // «Оставить заявку» в попапе услуги: закрываем его и открываем заявку с выбранной услугой
+    svcModal.querySelectorAll('[data-service-cta]').forEach((btn) => {
+      btn.addEventListener('click', async () => {
+        await svc.close();
+        if (openLeadModal) openLeadModal(btn.dataset.serviceCta);
+        else document.getElementById('cta').scrollIntoView({ behavior: 'smooth' });
+      });
     });
   }
 
