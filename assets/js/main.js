@@ -165,6 +165,26 @@
     });
   }
 
+  // Telegram: два номера — кнопка открывает меню выбора; закрытие — выбор номера, клик мимо, Esc
+  const tgToggle = document.querySelector('[data-tg-toggle]');
+  const tgMenu = document.getElementById('tg-menu');
+  if (tgToggle && tgMenu) {
+    const setTgMenu = (open) => {
+      tgMenu.hidden = !open;
+      tgToggle.setAttribute('aria-expanded', String(open));
+    };
+    tgToggle.addEventListener('click', () => {
+      const open = tgMenu.hidden;
+      setTgMenu(open);
+      if (open) tgMenu.querySelector('a').focus();
+    });
+    tgMenu.addEventListener('click', (e) => { if (e.target.closest('a')) setTgMenu(false); });
+    document.addEventListener('click', (e) => { if (!tgMenu.hidden && !e.target.closest('.fab-tg-wrap')) setTgMenu(false); });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !tgMenu.hidden) { setTgMenu(false); tgToggle.focus(); }
+    });
+  }
+
   // Кнопка «Получить консультацию»: на мобильном раскрывает форму, на десктопе — фокус на первое поле
   const ctaOpen = document.getElementById('cta-open');
   const ctaForm = document.getElementById('cta-form');
