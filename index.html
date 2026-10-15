@@ -149,6 +149,20 @@
       .to-top:active { transform: scale(0.94); }
       @media (prefers-reduced-motion: reduce) { .to-top { transition: none; } }
 
+      /* Быстрая связь: Telegram и звонок справа снизу. Когда появляется «Наверх» — поднимаются над ней */
+      .fab-stack { @apply fixed bottom-4 right-4 z-40 flex flex-col gap-3 lg:bottom-6 lg:right-6; transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1); }
+      .fab-stack.is-raised { transform: translateY(-60px); }
+      .fab { @apply relative grid h-12 w-12 place-items-center rounded-full shadow-[0_12px_26px_-10px_rgba(16,43,70,0.6)] transition-transform duration-200 hover:-translate-y-0.5; }
+      .fab:active { transform: scale(0.94); }
+      .fab-tg { background: #fff; color: #26A5E4; }
+      .fab-tg svg { width: 100%; height: 100%; }
+      .fab-call { background: #16A34A; color: #fff; }
+      .fab-call svg { width: 22px; height: 22px; }
+      .fab-label { @apply pointer-events-none absolute right-full top-1/2 mr-3 -translate-y-1/2 whitespace-nowrap rounded-md bg-navy px-3 py-1.5 text-[13px] font-medium text-white opacity-0 transition-opacity duration-200; }
+      .fab:hover .fab-label, .fab:focus-visible .fab-label { opacity: 1; }
+      @media (hover: none) { .fab-label { display: none; } }
+      @media (prefers-reduced-motion: reduce) { .fab-stack, .fab { transition: none; } }
+
       /* Попап заявки: нативный <dialog>; на мобильном — нижняя шторка */
       .modal {
         @apply m-auto max-h-[calc(100dvh-32px)] w-[calc(100%-32px)] max-w-[480px] overflow-y-auto rounded-xl border-0 bg-white p-0 text-ink shadow-[0_40px_90px_-30px_rgba(12,34,56,0.55)];
@@ -772,6 +786,18 @@
   </footer>
 
   <!-- Кнопка «Наверх» -->
+  <!-- Быстрая связь: Telegram (иконка — Simple Icons, путь без изменений) и звонок -->
+  <div class="fab-stack" id="fab-stack">
+    <a href="https://t.me/+998977000913" target="_blank" rel="noopener" class="fab fab-tg" aria-label="Написать в Telegram: +998 97 700-09-13">
+      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+      <span class="fab-label" aria-hidden="true">Написать в Telegram</span>
+    </a>
+    <a href="tel:+998933978068" class="fab fab-call" aria-label="Позвонить: +998 93 397-80-68">
+      <i data-lucide="phone"></i>
+      <span class="fab-label" aria-hidden="true">+998 93 397-80-68</span>
+    </a>
+  </div>
+
   <a href="#top" id="to-top" class="to-top" aria-label="Наверх"><i data-lucide="arrow-up" class="h-5 w-5"></i></a>
 
   <!-- ============ ПОПАП «ОСТАВИТЬ ЗАЯВКУ» ============ -->
@@ -1075,6 +1101,6 @@
   <script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
-  <script src="assets/js/main.js"></script>
+  <script src="assets/js/main.js?v=20261015"></script>
 </body>
 </html>

@@ -147,11 +147,16 @@
     schedule(DURATION);
   }
 
-  // Кнопка «Наверх»: показываем, когда hero ушёл из вида; прокрутка без «#top» в адресе
+  // Кнопка «Наверх»: показываем, когда hero ушёл из вида; прокрутка без «#top» в адресе.
+  // Кнопки быстрой связи в этот момент поднимаются над ней.
   const toTop = document.getElementById('to-top');
   const topSection = document.getElementById('top');
+  const fabStack = document.getElementById('fab-stack');
   if (toTop && topSection) {
-    new IntersectionObserver(([entry]) => toTop.classList.toggle('is-visible', !entry.isIntersecting)).observe(topSection);
+    new IntersectionObserver(([entry]) => {
+      toTop.classList.toggle('is-visible', !entry.isIntersecting);
+      if (fabStack) fabStack.classList.toggle('is-raised', !entry.isIntersecting);
+    }).observe(topSection);
     toTop.addEventListener('click', (e) => {
       e.preventDefault();
       const smooth = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
