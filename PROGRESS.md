@@ -5,7 +5,7 @@
 Клиент: ООО «MODERN MEDICINE ALLIANCE» (Ташкент) — охрана труда, обучение по ОТ и ТБ, аттестация рабочих мест. Папка проекта называется EXPRESS MED SERVICE.
 
 ## Статус
-Этап 2: по команде Farrukh (2026-10-23 «перенести на хостинг и добавить wordpress») макет перенесён в WP-тему `wp-theme/mma` + ACF Pro, проверен локально. Выкладка на боевой хостинг клиента (Sebweb, mma17.uz) ждёт рабочего доступа: FTP пассивный режим сломан на стороне сервера, SSH только по ключу.
+Этап 2 выполнен (2026-10-23): сайт работает на WordPress — **https://mma17.uz** (тема `wp-theme/mma` 1.0.2 + ACF Pro 6.3.6). Статичный макет остаётся на farik9797.github.io/mma-site.
 
 - Превью: https://farik9797.github.io/mma-site/
 - Репозиторий: https://github.com/farik9797/mma-site (public, Pages из `main` /root). Обновление превью — commit + push в `main`.
@@ -60,6 +60,14 @@
 - SSH clients.sebweb.uz:22 — только по ключу. Создан ключ `~/.ssh/mma17_sebweb` (публичный — `.pub`), нужно добавить на хостинге.
 - 2026-10-23: WordPress 7.1.3 на mma17.uz уже установлен (из панели хостера; тема twentytwentythree, ЧПУ нет — /wp-json/ даёт 404 от Apache). Стек: nginx → Apache 2.4.52 (Ubuntu). Farrukh дал пароль приложения для admin (одноразовый: не сохранять, отозвать после сессии; хранится только во временном файле сессии). REST по ?rest_route= работает, но авторизация не проходит: заголовок Authorization не доходит до PHP (даже неверный пароль → rest_not_logged_in). Лечится стандартным .htaccess WordPress (правило E=HTTP_AUTHORIZATION).
 - Тема 1.0.1: при первичной настройке пишет .htaccess (flush_rewrite_rules(true)) и проверяет /wp-json/ запросом к себе; не открылся — возвращает простые ссылки (флаг mma_permalinks_check). Архивы для загрузки через админку: `deploy/mma-theme.zip`, `deploy/advanced-custom-fields-pro.zip`.
+- **Выкладка 2026-10-23 (Farrukh: «все сделай сам»):**
+  - Доступ к файлам — **обычный FTP без TLS** (`set ftp:ssl-allow false`): сервер за NAT MikroTik (192.168.88.10), его FTP-помощник открывает порты данных только при открытом управляющем канале. FTPS и CCC не работают (ProFTPD рвёт соединение после CCC). Обёртка lftp — в scratchpad сессии, доступы берёт из password.md. Пароль FTP ушёл открытым текстом → сменить.
+  - WP 7.1.3 был установлен из панели хостера (префикс таблиц `wp_`, пользователь-админ `manager-mma17`). Бэкап исходных `.htaccess` и `wp-config.php` — `deploy/backup-2026-10-23/` (в .gitignore).
+  - Залит стандартный блок WordPress в `.htaccess` (в т. ч. `E=HTTP_AUTHORIZATION`) — Apache 2.4 (mod_php) его читает, заголовок авторизации доходит до PHP. Пароль приложения от Farrukh не подошёл ни к `admin`, ни к `manager-mma17` — не понадобился; отозвать.
+  - Тема и ACF Pro залиты по FTP; включены одноразовым mu-plugin-загрузчиком с секретным ключом (step1: activate ACF + switch_theme, step2: mma_maybe_setup), загрузчик сразу удалён (404 проверен). Итог: setup 1.0.1, «Главная» id=6, 15 фото в медиатеке, blog_public=1, ЧПУ — простые (проверка /wp-json/ запросом к себе не прошла; главной не мешает).
+  - Заявки: lead_emails = mma17@bk.ru (проверено на живом сайте). Почта — PHP sendmail (`-f webmaster@mma17.uz`); SPF домена `include:spf.smtp2go.com ~all`, DMARC p=none, MX mail.sebweb.uz. С 1.0.2 письмо о заявке уходит с `From: MODERN MEDICINE ALLIANCE <webmaster@mma17.uz>` (совпадает с конвертом). Доставку на bk.ru ещё не проверяли — нужна тестовая заявка; если не дойдёт — WP Mail SMTP.
+  - Обновление темы: правка в `wp-theme/mma` → поднять `MMA_VER` и Version в style.css → залить изменённые файлы по FTP (`put … -o themes/mma/…`). При правке классов — пересобрать CSS.
+  - В корне сайта осталась папка `__MACOSX` (мусор от распаковки архива) — удалить после «да» Farrukh.
 - После выкладки проверить: ЧПУ на nginx (если /privacy-policy/ даёт 404 — правило try_files у хостера), отправку писем (иначе WP Mail SMTP), сброс кэша.
 
 ## Открытые вопросы (запросить у клиента)

@@ -106,7 +106,12 @@ function mma_handle_lead() {
     $to = array_filter(array_map('trim', explode(',', (string) mma_opt('lead_emails'))), 'is_email');
     if (!$to) $to = [get_option('admin_email')];
     $subject = 'Заявка с сайта: ' . $name . ($service ? ' — ' . $service : '');
-    wp_mail($to, $subject, $text . "\nВсе заявки: " . admin_url('edit.php?post_type=mma_lead') . "\n");
+    // Отправитель — тот же адрес, что хостинг ставит в конверт письма (sendmail -f webmaster@домен):
+    // совпадение адресов снижает риск попасть в спам у Mail.ru
+    $host = wp_parse_url(home_url(), PHP_URL_HOST);
+    $host = preg_replace('/^www\./', '', (string) $host);
+    $headers = ['From: MODERN MEDICINE ALLIANCE <webmaster@' . $host . '>'];
+    wp_mail($to, $subject, $text . "\nВсе заявки: " . admin_url('edit.php?post_type=mma_lead') . "\n", $headers);
 
     set_transient($rate_key, $count + 1, 10 * MINUTE_IN_SECONDS);
     wp_send_json_success(['message' => 'Спасибо! Заявка отправлена — мы свяжемся с вами.']);
