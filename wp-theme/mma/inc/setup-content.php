@@ -43,9 +43,7 @@ function mma_maybe_setup() {
         update_option('page_on_front', $front);
     }
     if (!get_option('permalink_structure')) {
-        global $wp_rewrite;
-        $wp_rewrite->set_permalink_structure('/%postname%/');
-        flush_rewrite_rules(false);
+        mma_setup_permalinks();
     }
     if (!get_option('timezone_string')) update_option('timezone_string', 'Asia/Tashkent');
     update_option('date_format', 'd.m.Y');
@@ -74,6 +72,26 @@ function mma_maybe_setup() {
     add_action('admin_notices', function () {
         echo '<div class="notice notice-success"><p><strong>MODERN MEDICINE ALLIANCE:</strong> главная страница создана и заполнена текстами макета. Редактирование — «Страницы → Главная» и «Настройки сайта».</p></div>';
     });
+}
+
+/* ЧПУ /%postname%/. На Apache WordPress записывает .htaccess — в нём же правило, передающее
+   заголовок Authorization в PHP (нужно для паролей приложений и REST API).
+   Если после записи /wp-json/ не открывается (ЧПУ сервер не поддерживает) — оставляем простые ссылки, чтобы не было 404. */
+function mma_setup_permalinks() {
+    global $wp_rewrite;
+    update_option('permalink_structure', '/%postname%/');
+    $wp_rewrite->init();
+    flush_rewrite_rules(true);
+
+    $res = wp_remote_get(home_url('/wp-json/'), ['timeout' => 8, 'sslverify' => false, 'redirection' => 2]);
+    $ok = !is_wp_error($res) && (int) wp_remote_retrieve_response_code($res) === 200
+        && strpos((string) wp_remote_retrieve_header($res, 'content-type'), 'json') !== false;
+    if (!$ok) {
+        update_option('permalink_structure', '');
+        $wp_rewrite->init();
+        flush_rewrite_rules(false);
+    }
+    update_option('mma_permalinks_check', $ok ? 'pretty' : 'plain', false);
 }
 
 /* Рекурсивно меняет пути к картинкам темы (img/…) на ID вложений в медиатеке */

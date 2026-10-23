@@ -4,7 +4,7 @@
  */
 if (!defined('ABSPATH')) exit;
 
-define('MMA_VER', '1.0.0');
+define('MMA_VER', '1.0.1');
 define('MMA_DIR', get_template_directory());
 define('MMA_URI', get_template_directory_uri());
 
