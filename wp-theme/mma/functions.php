@@ -4,7 +4,7 @@
  */
 if (!defined('ABSPATH')) exit;
 
-define('MMA_VER', '1.0.2');
+define('MMA_VER', '1.0.3');
 define('MMA_DIR', get_template_directory());
 define('MMA_URI', get_template_directory_uri());
 
@@ -65,6 +65,17 @@ remove_action('admin_print_styles', 'print_emoji_styles');
 remove_action('wp_head', 'wp_generator');
 remove_action('wp_head', 'wlwmanifest_link');
 remove_action('wp_head', 'rsd_link');
+
+/* Фавиконка: временный знак MMA (щит и галочка Lucide, как в шапке). Если в «Внешний вид → Настроить →
+   Свойства сайта» задан свой значок, WordPress выводит его сам — тогда наш не выводим. */
+add_action('wp_head', function () {
+    if (has_site_icon()) return;
+    $u = MMA_URI . '/assets/favicon/';
+    echo '<link rel="icon" href="' . esc_url($u . 'favicon.ico') . '" sizes="48x48">' . "\n";
+    echo '<link rel="icon" href="' . esc_url($u . 'favicon.svg') . '" type="image/svg+xml">' . "\n";
+    echo '<link rel="apple-touch-icon" href="' . esc_url($u . 'apple-touch-icon.png') . '">' . "\n";
+    echo '<link rel="manifest" href="' . esc_url($u . 'site.webmanifest') . '">' . "\n";
+}, 2);
 
 /* SEO главной из «Настроек сайта», если нет SEO-плагина */
 function mma_has_seo_plugin() {
