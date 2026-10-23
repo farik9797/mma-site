@@ -4,8 +4,26 @@
     {
       "name": "mma-static",
       "runtimeExecutable": "python3",
-      "runtimeArgs": ["-m", "http.server", "8735"],
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8735"
+      ],
       "port": 8735
+    },
+    {
+      "name": "mma-wp",
+      "runtimeExecutable": "php",
+      "runtimeArgs": [
+        "-d",
+        "error_reporting=24575",
+        "-S",
+        "localhost:8890",
+        "-t",
+        "wp-local",
+        "wp-local/router.php"
+      ],
+      "port": 8890
     }
   ]
 }
