@@ -4,7 +4,7 @@
  */
 if (!defined('ABSPATH')) exit;
 
-define('MMA_VER', '1.0.3');
+define('MMA_VER', '1.0.4');
 define('MMA_DIR', get_template_directory());
 define('MMA_URI', get_template_directory_uri());
 
@@ -76,6 +76,42 @@ add_action('wp_head', function () {
     echo '<link rel="apple-touch-icon" href="' . esc_url($u . 'apple-touch-icon.png') . '">' . "\n";
     echo '<link rel="manifest" href="' . esc_url($u . 'site.webmanifest') . '">' . "\n";
 }, 2);
+
+/* Счётчики: Яндекс Метрика и Google Analytics 4 (номера — «Настройки сайта → Аналитика»).
+   Визиты вошедших администраторов и редакторов не считаем, чтобы не портить статистику. */
+function mma_track_visitor() {
+    return !(is_user_logged_in() && current_user_can('edit_posts'));
+}
+add_action('wp_head', function () {
+    if (!mma_track_visitor()) return;
+    $ga = strtoupper(trim((string) mma_opt('ga_id')));
+    if (preg_match('/^G-[A-Z0-9]{4,20}$/', $ga)) {
+        echo "<!-- Google tag (gtag.js) -->\n";
+        echo '<script async src="https://www.googletagmanager.com/gtag/js?id=' . esc_attr($ga) . '"></script>' . "\n";
+        echo "<script>\n  window.dataLayer = window.dataLayer || [];\n  function gtag(){dataLayer.push(arguments);}\n  gtag('js', new Date());\n\n  gtag('config', '" . esc_js($ga) . "');\n</script>\n";
+    }
+    $ym = preg_replace('/\D+/', '', (string) mma_opt('metrika_id'));
+    if ($ym) {
+        // Код счётчика — как выдала Метрика (Вебвизор, карта кликов, точный показатель отказов)
+        echo "<!-- Yandex.Metrika counter -->\n<script type=\"text/javascript\">\n";
+        echo "(function(m,e,t,r,i,k,a){\nm[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};\nm[i].l=1*new Date();\n";
+        echo "for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}\n";
+        echo "k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)\n";
+        echo "})(window, document,'script','https://mc.yandex.ru/metrika/tag.js?id=" . $ym . "', 'ym');\n\n";
+        echo "ym(" . $ym . ", 'init', {ssr:true, webvisor:true, clickmap:true, ecommerce:\"dataLayer\", referrer: document.referrer, url: location.href, accurateTrackBounce:true, trackLinks:true});\n";
+        echo "</script>\n<!-- /Yandex.Metrika counter -->\n";
+    }
+}, 3);
+add_action('wp_body_open', function () {
+    if (!mma_track_visitor()) return;
+    $ym = preg_replace('/\D+/', '', (string) mma_opt('metrika_id'));
+    if ($ym) echo '<noscript><div><img src="https://mc.yandex.ru/watch/' . $ym . '" style="position:absolute; left:-9999px;" alt="" /></div></noscript>' . "\n";
+});
+
+/* Карта сайта WordPress: без списка пользователей (не светим логин администратора) */
+add_filter('wp_sitemaps_add_provider', function ($provider, $name) {
+    return $name === 'users' ? false : $provider;
+}, 10, 2);
 
 /* SEO главной из «Настроек сайта», если нет SEO-плагина */
 function mma_has_seo_plugin() {

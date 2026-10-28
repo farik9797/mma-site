@@ -73,6 +73,10 @@ function mma_acf_options() {
             mma_tab('SEO главной'),
             mma_f('seo_title', 'Title главной', 'text', ['instructions' => 'Не используется, если установлен SEO-плагин (Yoast, Rank Math) — тогда заполняйте в нём.']),
             mma_f('seo_description', 'Meta description главной', 'textarea', ['rows' => 3, 'new_lines' => '']),
+
+            mma_tab('Аналитика'),
+            mma_f('metrika_id', 'Яндекс Метрика: номер счётчика', 'text', ['instructions' => 'Только цифры, например 113837191. Пусто — код Метрики не выводится. Визиты вошедших администраторов и редакторов не считаются.', 'wrapper' => ['width' => 50]]),
+            mma_f('ga_id', 'Google Analytics 4: идентификатор', 'text', ['instructions' => 'Вида G-XXXXXXXXXX. Пусто — код GA4 не выводится.', 'wrapper' => ['width' => 50]]),
         ],
         'location' => [[['param' => 'options_page', 'operator' => '==', 'value' => 'mma-settings']]],
     ]);

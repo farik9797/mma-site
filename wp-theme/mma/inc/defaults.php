@@ -282,6 +282,8 @@ function mma_defaults() {
             'copyright'       => '© {year} Modern Medicine Alliance. Все права защищены.',
             'seo_title'       => 'Охрана труда и аттестация рабочих мест в Ташкенте — MODERN MEDICINE ALLIANCE',
             'seo_description' => 'Обучение по охране труда и технике безопасности, аттестация рабочих мест и аутсорсинг охраны труда для предприятий Узбекистана. ООО «MODERN MEDICINE ALLIANCE» работает с 2010 года.',
+            'metrika_id'      => '113837191',
+            'ga_id'           => 'G-TWCZP0FQSC',
         ],
     ];
 
